@@ -52,7 +52,7 @@ class RabbleEyes {
 
         // Create black outline mesh
         const outlineShape = new THREE.Shape();
-        outlineShape.absellipse(0, 0, xRadius * 1.05, yRadius * 1.05, 0, Math.PI * 2, false, 0); // Thin outline for the eye
+        outlineShape.absellipse(0, 0, xRadius * 1.15, yRadius * 1.1, 0, Math.PI * 2, false, 0); // Thin outline for the eye
         const outlineGeo = new THREE.ShapeGeometry(outlineShape, 32);
         const outlineMat = new THREE.MeshBasicMaterial({
             color: 0x000000,
@@ -107,7 +107,7 @@ class RabbleEyes {
 
         // Create black outline mesh
         const outlineShape = new THREE.Shape();
-        outlineShape.absellipse(0, 0, xRadius * 1.05, yRadius * 1.05, 0, Math.PI * 2, false, 0); // Thin outline for the eye
+        outlineShape.absellipse(0, 0, xRadius * 1.15, yRadius * 1.1, 0, Math.PI * 2, false, 0); // Thin outline for the eye
         const outlineGeo = new THREE.ShapeGeometry(outlineShape, 32);
         const outlineMat = new THREE.MeshBasicMaterial({
             color: 0x000000,

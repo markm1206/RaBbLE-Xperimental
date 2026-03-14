@@ -1,0 +1,544 @@
+/* RabbleTheme.css - Rabble's Signature Style */
+
+/* Rabble's Color Palette */
+:root {
+    --rabble-purple: #8B5CF6;
+    --rabble-cyan: #06B6D4;
+    --rabble-pink: #EC4899;
+    --rabble-blue: #3B82F6;
+    --rabble-bg: #050505;
+    --rabble-panel: #0a0a0a;
+    --rabble-text: #ffffff;
+    --rabble-border: #333333;
+    --rabble-glow: 0 0 15px;
+    --rabble-scanline: rgba(0, 0, 0, 0.3);
+}
+
+/* Rabble's Energy Background System */
+body.rabble-theme {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, var(--rabble-bg) 0%, #1a1a2e 50%, var(--rabble-bg) 100%);
+    color: var(--rabble-text);
+    font-family: 'Segoe UI', 'Roboto Mono', 'Courier New', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animated Grid Background */
+body.rabble-theme::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: 0 0;
+    animation: gridMove 20s linear infinite;
+    pointer-events: none;
+    z-index: -2;
+}
+
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
+}
+
+/* Parallax Star Field */
+body.rabble-theme::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.8)), 
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 50px);
+    animation: starTwinkle 10s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes starTwinkle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Rabble's Header Style */
+.rabble-header {
+    background: linear-gradient(90deg, var(--rabble-purple), var(--rabble-cyan));
+    padding: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--rabble-glow) var(--rabble-purple);
+    position: relative;
+    overflow: hidden;
+}
+
+.rabble-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: headerSweep 3s ease-in-out infinite;
+}
+
+@keyframes headerSweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.rabble-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--rabble-cyan), var(--rabble-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.rabble-logo {
+    width: 45px;
+    height: 45px;
+    background: radial-gradient(circle, var(--rabble-purple), var(--rabble-cyan));
+    border-radius: 50%;
+    box-shadow: 0 0 30px var(--rabble-purple), 0 0 60px var(--rabble-cyan);
+    position: relative;
+    animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--rabble-purple), 0 0 60px var(--rabble-cyan); }
+    50% { transform: scale(1.1); box-shadow: 0 0 50px var(--rabble-purple), 0 0 100px var(--rabble-cyan); }
+}
+
+.rabble-logo::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    animation: corePulse 1s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.5; }
+}
+
+.rabble-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.rabble-button {
+    background: linear-gradient(135deg, var(--rabble-purple), var(--rabble-cyan));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: var(--rabble-glow) var(--rabble-purple);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.rabble-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px var(--rabble-cyan), 0 0 60px var(--rabble-purple);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.rabble-button:active {
+    transform: translateY(0);
+    box-shadow: 0 0 10px var(--rabble-purple);
+}
+
+.rabble-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.rabble-button:hover::before {
+    left: 100%;
+}
+
+/* Rabble's Main Content Grid */
+.rabble-main {
+    flex: 1;
+    padding: 40px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Rabble's Card System */
+.rabble-card {
+    background: linear-gradient(145deg, var(--rabble-panel), #151515);
+    border: 1px solid var(--rabble-border);
+    border-radius: 16px;
+    padding: 30px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border-left: 4px solid transparent;
+}
+
+.rabble-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-left-color: var(--rabble-cyan);
+    box-shadow: 0 20px 40px rgba(6, 182, 212, 0.3), 0 0 30px var(--rabble-cyan);
+    background: linear-gradient(145deg, #151515, var(--rabble-panel));
+}
+
+.rabble-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--rabble-purple), var(--rabble-cyan));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.rabble-card:hover::before {
+    transform: scaleX(1);
+}
+
+.rabble-card h2 {
+    margin: 0 0 15px 0;
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--rabble-cyan), var(--rabble-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.rabble-card p {
+    margin: 0 0 25px 0;
+    color: #aaa;
+    line-height: 1.6;
+    font-size: 14px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.rabble-card-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rabble-card-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--rabble-border);
+    color: var(--rabble-text);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.rabble-card-button:hover {
+    background: linear-gradient(135deg, var(--rabble-purple), var(--rabble-cyan));
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: var(--rabble-glow) var(--rabble-purple);
+    transform: translateY(-2px);
+}
+
+.rabble-card-button.primary {
+    background: linear-gradient(135deg, var(--rabble-purple), var(--rabble-cyan));
+    border: none;
+    color: white;
+}
+
+.rabble-card-button.primary:hover {
+    box-shadow: 0 0 30px var(--rabble-cyan), 0 0 60px var(--rabble-purple);
+}
+
+/* Rabble's Status Indicators */
+.rabble-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4caf50;
+    box-shadow: 0 0 15px #4caf50;
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.rabble-status.offline {
+    background: #666;
+    box-shadow: none;
+    animation: none;
+}
+
+.rabble-status.warning {
+    background: var(--rabble-pink);
+    box-shadow: 0 0 15px var(--rabble-pink);
+}
+
+/* Rabble's Footer */
+.rabble-footer {
+    background: linear-gradient(180deg, rgba(0,0,0,0), var(--rabble-panel));
+    border-top: 1px solid var(--rabble-border);
+    padding: 15px 20px;
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.rabble-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rabble-cyan), transparent);
+}
+
+.rabble-links {
+    display: flex;
+    gap: 25px;
+}
+
+.rabble-links a {
+    color: #888;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.rabble-links a:hover {
+    color: var(--rabble-cyan);
+    text-shadow: 0 0 10px var(--rabble-cyan);
+}
+
+/* Rabble's CRT Effects */
+.rabble-crt {
+    position: relative;
+    border: 4px solid #000;
+    border-radius: 8px;
+    box-shadow: 
+        inset 0 0 50px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.rabble-crt::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(255, 255, 255, 0.03) 50%, transparent 50%);
+    background-size: 100% 4px;
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+/* Rabble's Loading Animations */
+.rabble-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--rabble-cyan);
+    animation: spin 1s ease-in-out infinite;
+    position: relative;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.rabble-loading::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 3px solid rgba(139, 92, 246, 0.3);
+    border-radius: 50%;
+    animation: spin 2s ease-in-out infinite reverse;
+}
+
+/* Rabble's Parallax Effects */
+.rabble-parallax {
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.rabble-parallax-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Rabble's Energy Particles */
+.rabble-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.rabble-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--rabble-cyan);
+    border-radius: 50%;
+    animation: float 10s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+/* Rabble's Responsive Design */
+@media (max-width: 768px) {
+    .rabble-main {
+        grid-template-columns: 1fr;
+        padding: 20px 15px;
+    }
+    
+    .rabble-card {
+        padding: 20px;
+    }
+    
+    .rabble-actions {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    
+    .rabble-title {
+        font-size: 20px;
+        gap: 10px;
+    }
+    
+    .rabble-logo {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* Rabble's Focus States */
+.rabble-card:focus, .rabble-button:focus {
+    outline: 2px solid var(--rabble-cyan);
+    outline-offset: 2px;
+}
+
+/* Rabble's Accessibility */
+.rabble-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Rabble's Print Styles */
+@media print {
+    body.rabble-theme {
+        background: white;
+        color: black;
+    }
+    
+    .rabble-card, .rabble-button {
+        background: white;
+        color: black;
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+    
+    .rabble-header {
+        background: black;
+        color: white;
+    }
+}

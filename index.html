@@ -3,32 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rabble - AI Agent Interface</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #000;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-        #rabble-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        rabble-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-    </style>
+    <title>RabbleOS 3D - Web Operating System</title>
+    
+    <!-- Import Rabble Theme -->
+    <link rel="stylesheet" href="style/RabbleTheme.css">
+    
+    <!-- Import RabbleOS Layout Styles -->
+    <link rel="stylesheet" href="style/RabbleOS.css">
 </head>
-<body>
-    <div id="rabble-container">
-        <rabble-canvas></rabble-canvas>
+<body class="rabble-theme">
+    <!-- OS Header -->
+    <div class="rabbleos-header">
+        <div class="os-title">RabbleOS 3D</div>
+        <div class="os-status">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" style="background: var(--rabble-purple); box-shadow: 0 0 8px var(--rabble-purple);"></div>
+                <span>AI Core Active</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>Network Connected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main OS Container -->
+    <div class="rabbleos-container">
+        <!-- Editor Application Window (Largest - Top Left) -->
+        <div class="os-window editor-window">
+            <div class="window-header">
+                <div class="window-title">Render Engine Editor</div>
+                <div class="window-controls">
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                    <div class="control-btn close"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="editor-controls">
+                    <div class="control-group">
+                        <label>Mouth Intensity</label>
+                        <input type="range" id="editor-mouth-intensity" min="0" max="3" step="0.1" value="1.0">
+                    </div>
+                    <div class="control-group">
+                        <label>Wave Amplitude</label>
+                        <input type="range" id="editor-wave-amp" min="0" max="2" step="0.1" value="0.5">
+                    </div>
+                    <div class="control-group">
+                        <label>Eye X Position</label>
+                        <input type="range" id="editor-eye-x" min="-2" max="2" step="0.1" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label>Eye Y Position</label>
+                        <input type="range" id="editor-eye-y" min="-2" max="2" step="0.1" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label>Particle Size</label>
+                        <input type="range" id="editor-particle-size" min="0.05" max="1.0" step="0.01" value="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label>Particle Opacity</label>
+                        <input type="range" id="editor-particle-opacity" min="0" max="1" step="0.01" value="0.5">
+                    </div>
+                </div>
+                
+                <div class="editor-actions">
+                    <button class="test-btn" id="editor-test-speak">Speak</button>
+                    <button class="test-btn" id="editor-test-listen">Listen</button>
+                    <button class="test-btn" id="editor-test-react">React</button>
+                    <button class="test-btn" id="editor-test-idle">Idle</button>
+                    <button class="test-btn" id="editor-test-save">Save Config</button>
+                    <button class="test-btn" id="editor-test-load">Load Config</button>
+                </div>
+
+                <div id="editor-status" style="margin-top: 10px; font-size: 12px; color: #888;">
+                    Editor application ready
+                </div>
+            </div>
+        </div>
+
+        <!-- Rabble 3D Display Window (Small - Top Right, Non-Closable) -->
+        <div class="os-window rabble-display">
+            <div class="window-header">
+                <div class="window-title">Rabble Character</div>
+                <div class="window-controls">
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                    <!-- No close button - Rabble window is permanent -->
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="rabble-container" id="rabble-container">
+                    <rabble-canvas></rabble-canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Window (Full Width - Bottom) -->
+        <div class="os-window terminal-window">
+            <div class="window-header">
+                <div class="window-title">AI Terminal Interface</div>
+                <div class="window-controls">
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                    <div class="control-btn close"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="terminal-header">
+                    <span>user@rabbleos:~/system</span>
+                    <span>Terminal v1.0</span>
+                </div>
+                <div class="terminal-content" id="terminal-output">
+                    <div class="status-message">RabbleOS 3D v1.0.0 initialized</div>
+                    <div class="status-message">AI Core Status: ONLINE</div>
+                    <div class="status-message">Type 'help' for available commands</div>
+                    <br>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">user@rabbleos:~$</span> <span id="terminal-cursor">|</span>
+                    </div>
+                </div>
+                <div class="terminal-input">
+                    <span class="terminal-prompt">user@rabbleos:~$</span>
+                    <input type="text" id="terminal-input" placeholder="Type command..." autocomplete="off">
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Three.js CDN -->
@@ -38,12 +142,19 @@
     <script src="js/config.js"></script>
     <script src="js/RabbleRenderer.js"></script>
     <script src="js/AnimationController.js"></script>
+    <script src="js/CombinedAnimationController.js"></script>
     <script src="js/RabbleBody.js"></script>
+    <script src="js/RabbleParticles.js"></script>
     <script src="js/Waveform.js"></script>
     <script src="js/RabbleMouth.js"></script>
     <script src="js/RabbleEyes.js"></script>
     <script src="js/Rabble.js"></script>
     <script src="js/RabbleCanvas.js"></script>
     <script src="js/index.js"></script>
+
+    <!-- RabbleOS Components -->
+    <script src="js/RabbleOS.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/editor.js"></script>
 </body>
 </html>

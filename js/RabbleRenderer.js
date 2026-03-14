@@ -143,8 +143,8 @@ class RabbleRenderer {
         this.previousMouseX = 0;   // Previous frame's mouse position
         this.previousMouseY = 0;   // Previous frame's mouse position
         
-        this.tiltSpeed = 0.07;        // How fast the camera responds to mouse movement
-        this.tiltDecay = 0.1;        // How quickly the tilt effect settles
+        this.tiltSpeed = 0.25;        // How fast the camera responds to mouse movement
+        this.tiltDecay = 0.25;        // How quickly the tilt effect settles
 
         const handleMouseMove = (event) => {
             if (!this.container || !this.pivot || !this.camera) return;

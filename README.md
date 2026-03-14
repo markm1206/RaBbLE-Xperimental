@@ -1,41 +1,57 @@
-# Rabble - 3D AI Character Interface
+# RabbleOS 3D - Web Operating System
 
-A lightweight, portable 3D character built with Three.js for Agentic Web OS interfaces.
+A complete web-based operating system built around a 3D AI character interface. The system provides a tiling window manager with three main applications: a 3D character display, a terminal interface, and an editor for testing the render engine.
 
-## Concept Art
+## 🎯 **System Overview**
 
-The character design is inspired by the concept art in `RabbleConcept01.afphoto` and `RabbleConcept01.png`. Rabble is an artificial intelligence entity made of energy, serving as the main user interface for interacting with Agentic Web OS systems.
+RabbleOS 3D is a modern web operating system featuring:
 
-**Key Design Elements:**
-- **Energy Body**: Particle-based form with purple-to-blue gradient representing pure energy
-- **Waveform Mouth**: Animated waveforms that flow through the center, responding to speech and interaction
-- **Portal Eyes**: Camera-facing circular eyes with portal-like eyebrow arches above and below
-- **Dark Background**: Black void environment emphasizing the energy nature
+- **Tiling Window Manager**: Clean, responsive CSS Grid-based layout
+- **3D AI Character**: Interactive Rabble character with real-time animation
+- **Terminal Interface**: Command-line interface with 20+ commands
+- **Editor Application**: Visual interface for render engine testing
+- **Rabble Energy Theme**: Cyberpunk purple/cyan aesthetic
+- **Framework Agnostic**: Works in any modern browser
 
-![Rabble Concept Art](RabbleConcept01.png)
+## 🏗️ **Architecture**
 
-## Features
+### **Window Layout**
+```
+┌─────────────────┬─────────────┐
+│                 │             │
+│   Editor App    │  Rabble 3D  │
+│   (Largest)     │  (Small,    │
+│                 │   Permanent)│
+├─────────────────┼─────────────┤
+│                               │
+│        Terminal App           │
+│         (Full width)          │
+│                               │
+└───────────────────────────────┘
+```
 
-- **Particle-based energy body** with purple-to-blue gradient
-- **Animated waveform mouth** that responds to speech and interaction
-- **Camera-facing eyes** with portal-like eyebrow arches
-- **State-based animation system** (idle, speaking, listening, reacting)
-- **Web Component architecture** for easy integration
-- **Framework-agnostic** - works in any web environment
+### **Core Components**
+- **RabbleOS** (`js/RabbleOS.js`) - Main operating system logic
+- **RabbleCanvas** (`js/RabbleCanvas.js`) - 3D character component
+- **Terminal** (`js/terminal.js`) - Command-line interface
+- **Editor** (`js/editor.js`) - Visual testing interface
+- **Rabble Theme** (`style/RabbleTheme.css`) - Cyberpunk aesthetic
+- **OS Layout** (`style/RabbleOS.css`) - Window management styles
 
-## Quick Start
+## 🚀 **Quick Start**
 
-### Basic Usage
-
+### **Basic Usage**
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>RabbleOS 3D</title>
+    <link rel="stylesheet" href="style/RabbleTheme.css">
+    <link rel="stylesheet" href="style/RabbleOS.css">
 </head>
-<body>
-    <rabble-canvas id="my-rabble"></rabble-canvas>
-
+<body class="rabble-theme">
+    <!-- RabbleOS will be loaded here -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/RabbleRenderer.js"></script>
     <script src="js/AnimationController.js"></script>
@@ -44,124 +60,212 @@ The character design is inspired by the concept art in `RabbleConcept01.afphoto`
     <script src="js/RabbleEyes.js"></script>
     <script src="js/Rabble.js"></script>
     <script src="js/RabbleCanvas.js"></script>
-    <script src="js/index.js"></script>
-
-    <script>
-        // Control the character
-        const rabble = document.getElementById('my-rabble');
-        rabble.speak();    // Make mouth animate intensely
-        rabble.listen();   // Subtle listening animation
-        rabble.react();    // Excited reaction
-        rabble.lookAt(1, 0, 0); // Look right
-    </script>
+    <script src="js/RabbleOS.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/editor.js"></script>
 </body>
 </html>
 ```
 
-### React/Vue Integration
+### **Terminal Commands**
+```bash
+# Rabble Control
+rabble speak              # Make Rabble speak
+rabble listen             # Put Rabble in listening mode
+rabble react              # Trigger reaction animation
+rabble idle               # Return to idle state
 
-```jsx
-// React example
-import React, { useRef, useEffect } from 'react';
+# Interaction
+rabble lookat 1 0 0       # Make Rabble look at coordinates
 
-function RabbleComponent() {
-  const rabbleRef = useRef(null);
+# System
+system status             # Show system status
+test animation            # Open animation studio
 
-  useEffect(() => {
-    // Load scripts if not already loaded
-    // Then control via ref
-    if (rabbleRef.current) {
-      rabbleRef.current.speak();
-    }
-  }, []);
+# Configuration
+save config               # Save current configuration
+load config               # Load configuration from file
 
-  return <rabble-canvas ref={rabbleRef} />;
-}
+# Testing
+test speak                # Test speaking function
+test listen               # Test listening function
+test react                # Test reaction function
+test idle                 # Test idle function
 ```
 
-## API Reference
+### **Editor Controls**
+The editor provides real-time sliders for:
+- **Mouth Intensity**: Control waveform intensity (0.0 to 3.0)
+- **Wave Amplitude**: Control wave animation amplitude (0.0 to 2.0)
+- **Eye Position**: Control eye movement (X and Y axes)
+- **Particle Size**: Control energy particle size (0.05 to 1.0)
+- **Particle Opacity**: Control particle transparency (0.0 to 1.0)
 
-### RabbleCanvas Web Component
-
-#### Methods
-- `speak()` - Trigger speaking animation
-- `listen()` - Enter listening state
-- `stopListening()` - Exit listening state
-- `react()` - Trigger reaction animation
-- `lookAt(x, y, z)` - Make eyes look at coordinates
-
-#### Properties
-- `getRabble()` - Get direct access to Rabble instance
-- `getRenderer()` - Get Three.js renderer
-- `getScene()` - Get Three.js scene
-- `getCamera()` - Get Three.js camera
-
-## Configuration
-
-Edit `js/config.js` to customize:
-
-```javascript
-const CONFIG = {
-    colors: {
-        body: { inner: 0x8B5CF6, outer: 0x3B82F6 }, // Purple to blue
-        mouth: 0x06B6D4,                             // Cyan
-        background: 0x000000                         // Black
-    },
-    particles: {
-        count: 800,       // Performance vs visual quality
-        size: 2.5         // Particle size
-    },
-    // ... more options
-};
-```
-
-## Architecture
-
-- **`RabbleCanvas`** - Web Component wrapper
-- **`Rabble`** - Main character class
-- **`RabbleBody`** - Particle system for energy effect
-- **`RabbleMouth`** - Animated waveforms
-- **`RabbleEyes`** - Camera-facing eyes with portals
-- **`AnimationController`** - State machine for behaviors
-- **`RabbleRenderer`** - Three.js scene management
-
-## Performance
-
-- **~800 particles** for smooth 60fps on most devices
-- **No textures** - pure geometry for lightweight rendering
-- **Normal blending** for proper depth layering
-- **LOD-ready** - easily reduce particle count for lower-end devices
-
-## Browser Support
-
-- Modern browsers with WebGL support
-- Tested with Three.js r128+
-- Web Components v1 support required
-
-## Development
-
-1. Open `index.html` for basic demo
-2. Open `test.html` for interactive testing
-3. Check browser console for errors
-4. Modify `js/config.js` for customization
-
-## Files
+## 📁 **File Structure**
 
 ```
 RabbleOS_3D/
-├── RabbleConcept01.afphoto  # Affinity Photo concept art file
-├── RabbleConcept01.png      # PNG export of concept art
-├── index.html               # Basic demo
-├── test.html                # Interactive test page
+├── index.html                    # Main OS interface
 ├── js/
-│   ├── config.js            # Configuration settings
-│   ├── RabbleRenderer.js    # Three.js scene management
-│   ├── AnimationController.js # State machine
-│   ├── RabbleBody.js        # Particle system
-│   ├── RabbleMouth.js       # Waveform animations
-│   ├── RabbleEyes.js        # Eye system
-│   ├── Rabble.js            # Main character class
-│   ├── RabbleCanvas.js      # Web Component
-│   └── index.js             # Module exports
-└── README.md                # This file
+│   ├── RabbleOS.js              # Main OS logic & window management
+│   ├── terminal.js              # Terminal application logic
+│   ├── editor.js                # Editor application logic
+│   ├── RabbleCanvas.js          # 3D Character Web Component
+│   ├── RabbleRenderer.js        # Three.js scene management
+│   ├── AnimationController.js   # State machine for animations
+│   ├── RabbleBody.js            # Particle system for energy effect
+│   ├── RabbleMouth.js           # Animated waveforms
+│   ├── RabbleEyes.js            # Camera-facing eyes with portals
+│   └── [other components]
+├── style/
+│   ├── RabbleOS.css             # OS layout and window management styles
+│   ├── RabbleTheme.css          # Rabble Energy aesthetic theme
+│   └── [other styles]
+├── docs/                        # Documentation
+│   ├── architecture.md          # System architecture overview
+│   ├── components.md            # Component documentation
+│   ├── terminal.md              # Terminal API documentation
+│   ├── editor.md                # Editor functionality
+│   └── api.md                   # Complete API reference
+└── Extras/                      # Additional tools and examples
+    ├── animation-studio.html    # Advanced animation interface
+    └── test-system.html         # System testing interface
 ```
+
+## 🎨 **Rabble Energy Theme**
+
+The system uses a cyberpunk purple/cyan color scheme:
+
+```css
+:root {
+    --rabble-cyan: #06B6D4;
+    --rabble-purple: #8B5CF6;
+    --rabble-red: #EF4444;
+    --rabble-panel: #151515;
+    --rabble-border: #333333;
+}
+```
+
+## 🔧 **API Reference**
+
+### **RabbleCanvas Methods**
+```javascript
+const rabble = document.querySelector('rabble-canvas');
+
+// Animation Control
+rabble.speak();                    // Trigger speaking animation
+rabble.listen();                   // Enter listening state
+rabble.react();                    // Trigger reaction animation
+rabble.idle();                     // Return to idle state
+
+// Interaction Control
+rabble.lookAt(x, y, z);            // Control eye movement
+
+// Configuration
+rabble.setMouthPolynomial(index, coeffs, degree);  // Control mouth animation
+rabble.setParticleSizeRange(min, max);             // Control particle effects
+rabble.setParticleOpacity(opacity);                // Control particle transparency
+
+// Save/Load
+rabble.saveConfiguration(filename);                // Save current state
+rabble.loadConfigurationFromFile(file);            // Load from file
+rabble.loadConfigurationFromObject(config);        // Load from object
+```
+
+### **Terminal Integration**
+```javascript
+// Terminal commands are processed automatically
+// Example: Type "rabble speak" in terminal to trigger speaking animation
+```
+
+### **Editor Integration**
+```javascript
+// Editor controls update RabbleCanvas in real-time
+// Sliders and buttons provide immediate visual feedback
+```
+
+## 📖 **Documentation**
+
+Comprehensive documentation is available in the `docs/` folder:
+
+- **[Architecture](docs/architecture.md)** - System overview and component relationships
+- **[Components](docs/components.md)** - Detailed component documentation
+- **[Terminal](docs/terminal.md)** - Terminal application API and commands
+- **[Editor](docs/editor.md)** - Editor application features and controls
+- **[API](docs/api.md)** - Complete API reference for all components
+
+## 🎮 **Features**
+
+### **Rabble 3D Character**
+- Particle-based energy body with purple-to-blue gradient
+- Animated waveform mouth responding to speech
+- Camera-facing eyes with portal-like effects
+- State-based animation system (idle, speaking, listening, reacting)
+- Real-time property control (position, scale, animation parameters)
+
+### **Terminal Application**
+- Real-time command processing with 20+ available commands
+- Command history with arrow key navigation
+- Integration with Rabble character controls
+- System status monitoring
+- Configuration save/load functionality
+
+### **Editor Application**
+- Real-time control sliders for all Rabble parameters
+- Test buttons for all animation states
+- Configuration save/load functionality
+- Integration with terminal commands
+- Animation studio integration
+
+### **Window Management**
+- CSS Grid-based tiling window manager
+- Responsive design that adapts to different screen sizes
+- Smooth animations and hover effects
+- Non-closable Rabble window (permanent display)
+- Minimize/maximize functionality for other windows
+
+## 🚀 **Development**
+
+### **Prerequisites**
+- Modern browser with WebGL support
+- Three.js r128+ (loaded via CDN)
+- Web Components v1 support
+
+### **Development Workflow**
+1. Open `index.html` to see the complete RabbleOS
+2. Use browser developer tools for debugging
+3. Modify `js/config.js` for customization
+4. Edit component files for feature development
+5. Update documentation in `docs/` folder
+
+### **Performance Optimization**
+- **Particle Count**: Configurable particle count (default: 800)
+- **LOD System**: Ready for Level-of-Detail implementation
+- **Memory Management**: Proper cleanup of Three.js objects
+- **Animation Loop**: Optimized render loop with delta time
+
+## 🌐 **Browser Support**
+
+- **Modern Browsers**: Chrome, Firefox, Safari, Edge
+- **WebGL Support**: Required for 3D rendering
+- **Web Components**: v1 support required
+- **ES6+ Features**: Arrow functions, classes, modules
+
+## 🤝 **Contributing**
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add documentation
+5. Submit a pull request
+
+## 📄 **License**
+
+This project is licensed under Custom License - see the LICENSE file for details.
+
+## 🙏 **Acknowledgments**
+
+- **Three.js** - 3D graphics library
+- **Web Components** - Custom element framework
+- **Cyberpunk Aesthetic** - Inspired by retro-futuristic design
+- **Tiling Window Managers** - Inspired by i3, Hyprland, and others

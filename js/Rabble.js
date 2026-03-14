@@ -4,23 +4,29 @@ class Rabble {
         this.body = null;
         this.mouth = null;
         this.eyes = null;
+        this.particles = null;
         this.animationController = null;
         this.camera = camera;
+        this.animations = new Map();
 
         this.init();
     }
 
     init() {
-        // Create character components
+        // Create character components using standalone versions
         this.body = new RabbleBody();
         this.mouth = new RabbleMouth();
         this.eyes = new RabbleEyes(this.camera);
-        this.animationController = new AnimationController();
+        this.particles = new RabbleParticles(CONFIG);
+
+        // Create combined animation controller
+        this.animationController = new CombinedAnimationController();
 
         // Add components to main group
         this.group.add(this.body.getMesh());
         this.group.add(this.mouth.getGroup());
         this.group.add(this.eyes.getGroup());
+        this.group.add(this.particles.getMesh());
 
         // Set up animation controller callbacks
         this.animationController.onBodyUpdate = (deltaTime, driftOffset) => {
@@ -33,6 +39,10 @@ class Rabble {
 
         this.animationController.onEyesUpdate = (deltaTime, position) => {
             this.eyes.update(deltaTime, position);
+        };
+
+        this.animationController.onParticlesUpdate = (deltaTime) => {
+            this.particles.update(deltaTime);
         };
 
         // Position the character
@@ -50,11 +60,11 @@ class Rabble {
     }
 
     update(deltaTime) {
-        // Update animation controller
+        // Update animation controller (handles both state machine and keyframe animations)
         this.animationController.update(deltaTime);
     }
 
-    // Public API methods
+    // Public API methods - state machine
     speak() {
         this.animationController.speak();
     }
@@ -75,6 +85,41 @@ class Rabble {
         this.animationController.lookAt(x, y, z);
     }
 
+    // Public API methods - keyframe animation
+    loadAnimation(animationData) {
+        this.animationController.loadAnimation(animationData);
+    }
+
+    playAnimation(name, loop = false) {
+        this.animationController.playAnimation(name, loop);
+    }
+
+    stopAnimation() {
+        this.animationController.stopAnimation();
+    }
+
+    // State blending
+    blendToState(newState, duration = 0.5) {
+        this.animationController.blendToState(newState, duration);
+    }
+
+    // Getters for animation system
+    getAnimations() {
+        return this.animationController.getAnimations();
+    }
+
+    getAnimation(name) {
+        return this.animationController.getAnimation(name);
+    }
+
+    isPlaying() {
+        return this.animationController.isPlaying();
+    }
+
+    getCurrentState() {
+        return this.animationController.getCurrentState();
+    }
+
     getGroup() {
         return this.group;
     }
@@ -84,5 +129,6 @@ class Rabble {
         if (this.body) this.body.dispose();
         if (this.mouth) this.mouth.dispose();
         if (this.eyes) this.eyes.dispose();
+        if (this.particles) this.particles.dispose();
     }
 }
