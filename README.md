@@ -1,5 +1,7 @@
 # RabbleOS 3D - Web Operating System
 
+![RabbleOS 3D](RaBbLE.png)
+
 A complete web-based operating system built around a 3D AI character interface. The system provides a tiling window manager with three main applications: a 3D character display, a terminal interface, and an editor for testing the render engine.
 
 ## 🎯 **System Overview**
