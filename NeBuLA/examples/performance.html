@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaBbLE Nebula - Performance Test Suite</title>
+    <style>
+        /* Clean, minimal styling - RBCNS compliant */
+        body { 
+            margin: 0; 
+            background: #000; 
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        #container { 
+            width: 100vw; 
+            height: 100vh; 
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            color: #ffffff;
+            pointer-events: auto;
+            font-family: monospace;
+            z-index: 100;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            margin: 15px 0 8px 0;
+            font-size: 14px;
+            color: #ff00ff;
+        }
+        
+        .test-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .test-status {
+            font-size: 12px;
+            color: #888;
+            margin: 5px 0;
+        }
+        
+        .test-result {
+            font-size: 11px;
+            color: #00ffcc;
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        
+        button {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 8px 12px;
+            margin: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: monospace;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        button:hover {
+            background: #555;
+            border-color: #00ffcc;
+            color: #00ffcc;
+        }
+        
+        button:disabled {
+            background: #222;
+            color: #666;
+            border-color: #444;
+            cursor: not-allowed;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            margin: 5px 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #00ffcc;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin: 2px 0;
+        }
+        
+        .metric-label {
+            color: #888;
+        }
+        
+        .metric-value {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+        
+        .recommendations {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            border-radius: 4px;
+        }
+        
+        .recommendations h3 {
+            margin: 0 0 10px 0;
+            color: #ff0000;
+            font-size: 12px;
+        }
+        
+        .recommendation-item {
+            font-size: 11px;
+            color: #fff;
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div id="ui-overlay">
+        <h1>Performance Test Suite</h1>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <button onclick="runAllTests()" id="btn-run-all">Run All Tests</button>
+            <button onclick="runEntityCountTest()" id="btn-entity-test">Entity Count Test</button>
+            <button onclick="runPatternStabilityTest()" id="btn-pattern-test">Pattern Stability Test</button>
+            <button onclick="runMemoryTest()" id="btn-memory-test">Memory Usage Test</button>
+            <button onclick="runFPSTest()" id="btn-fps-test">FPS Performance Test</button>
+            <button onclick="runChaosTest()" id="btn-chaos-test">Chaos Bounds Test</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Status</h2>
+            <div class="test-status" id="test-status">Ready to run tests</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="test-progress"></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Benchmark Results</h2>
+            <div class="metric-row">
+                <span class="metric-label">Max Stable Entities:</span>
+                <span class="metric-value" id="max-entities">0</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Optimal FPS:</span>
+                <span class="metric-value" id="optimal-fps">0</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Peak Memory:</span>
+                <span class="metric-value" id="peak-memory">0.00 MB</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Pattern Stability:</span>
+                <span class="metric-value" id="pattern-stability">0</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Overall Score:</span>
+                <span class="metric-value" id="overall-score">0</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div class="test-result" id="entity-result">Entity Test: Not run</div>
+            <div class="test-result" id="pattern-result">Pattern Test: Not run</div>
+            <div class="test-result" id="memory-result">Memory Test: Not run</div>
+            <div class="test-result" id="fps-result">FPS Test: Not run</div>
+            <div class="test-result" id="chaos-result">Chaos Test: Not run</div>
+        </div>
+        
+        <div class="recommendations" id="recommendations-section" style="display: none;">
+            <h3>Optimization Recommendations</h3>
+            <div id="recommendations-list"></div>
+        </div>
+    </div>
+
+    <!-- Single import - RBCNS compliant -->
+    <script type="module">
+        import { RaBbLE_Nebula_Performance_Test } from './performance.js';
+        
+        // Initialize performance test suite
+        const performanceTest = new RaBbLE_Nebula_Performance_Test('#container');
+        
+        // Expose to global scope for UI controls
+        window.performanceTest = performanceTest;
+        
+        // UI Control Functions
+        window.runAllTests = async () => {
+            updateTestStatus('Running all tests...');
+            disableButtons();
+            
+            try {
+                const report = await performanceTest.runAllTests();
+                updateResults(report);
+                updateTestStatus('All tests completed successfully');
+            } catch (error) {
+                updateTestStatus('Test failed: ' + error.message);
+            } finally {
+                enableButtons();
+            }
+        };
+        
+        window.runEntityCountTest = async () => {
+            updateTestStatus('Running entity count test...');
+            disableButtons();
+            
+            try {
+                const result = await performanceTest.runEntityCountTest(1500);
+                updateEntityResult(result);
+                updateTestStatus('Entity count test completed');
+            } catch (error) {
+                updateTestStatus('Entity test failed: ' + error.message);
+            } finally {
+                enableButtons();
+            }
+        };
+        
+        window.runPatternStabilityTest = async () => {
+            updateTestStatus('Running pattern stability test...');
+            disableButtons();
+            
+            try {
+                const result = await performanceTest.runPatternStabilityTest(15000);
+                updatePatternResult(result);
+                updateTestStatus('Pattern stability test completed');
+            } catch (error) {
+                updateTestStatus('Pattern test failed: ' + error.message);
+            } finally {
+                enableButtons();
+            }
+        };
+        
+        window.runMemoryTest = async () => {
+            updateTestStatus('Running memory usage test...');
+            disableButtons();
+            
+            try {
+                const result = await performanceTest.runMemoryUsageTest(30000);
+                updateMemoryResult(result);
+                updateTestStatus('Memory test completed');
+            } catch (error) {
+                updateTestStatus('Memory test failed: ' + error.message);
+            } finally {
+                enableButtons();
+            }
+        };
+        
+        window.runFPSTest = async () => {
+            updateTestStatus('Running FPS performance test...');
+            disableButtons();
+            
+            try {
+                const result = await performanceTest.runFPSPerformanceTest();
+                updateFPSResult(result);
+                updateTestStatus('FPS test completed');
+            } catch (error) {
+                updateTestStatus('FPS test failed: ' + error.message);
+            } finally {
+                enableButtons();
+            }
+        };
+        
+        window.runChaosTest = async () => {
+            updateTestStatus('Running chaos bounds test...');
+            disableButtons();
+            
+            try {
+                const result = await performanceTest.runChaosBoundsTest();
+                updateChaosResult(result);
+                updateTestStatus('Chaos bounds test completed');
+            } catch (error) {
+                updateTestStatus('Chaos test failed: ' + error.message);
+            } finally {
+                enableButtons();
+            }
+        };
+        
+        // Helper Functions
+        function updateTestStatus(status) {
+            document.getElementById('test-status').textContent = status;
+        }
+        
+        function disableButtons() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+        }
+        
+        function enableButtons() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = false);
+        }
+        
+        function updateResults(report) {
+            // Update benchmark data
+            document.getElementById('max-entities').textContent = report.benchmark_data.max_entities;
+            document.getElementById('optimal-fps').textContent = report.benchmark_data.optimal_fps.toFixed(1);
+            document.getElementById('peak-memory').textContent = report.benchmark_data.memory_peak.toFixed(2) + ' MB';
+            document.getElementById('pattern-stability').textContent = report.benchmark_data.pattern_stability_score.toFixed(1);
+            document.getElementById('overall-score').textContent = report.overall_score.toFixed(1);
+            
+            // Update individual test results
+            if (report.test_results.entity_count_test) {
+                updateEntityResult(report.test_results.entity_count_test);
+            }
+            if (report.test_results.pattern_stability_test) {
+                updatePatternResult(report.test_results.pattern_stability_test);
+            }
+            if (report.test_results.memory_usage_test) {
+                updateMemoryResult(report.test_results.memory_usage_test);
+            }
+            if (report.test_results.fps_performance_test) {
+                updateFPSResult(report.test_results.fps_performance_test);
+            }
+            if (report.test_results.chaos_bounds_test) {
+                updateChaosResult(report.test_results.chaos_bounds_test);
+            }
+            
+            // Update recommendations
+            updateRecommendations(report.recommendations);
+        }
+        
+        function updateEntityResult(result) {
+            const element = document.getElementById('entity-result');
+            element.textContent = `Entity Test: Max stable = ${result.max_stable_entities}, Duration = ${(result.test_duration/1000).toFixed(1)}s`;
+        }
+        
+        function updatePatternResult(result) {
+            const element = document.getElementById('pattern-result');
+            element.textContent = `Pattern Test: Overall score = ${result.overall_stability_score.toFixed(1)}`;
+        }
+        
+        function updateMemoryResult(result) {
+            const element = document.getElementById('memory-result');
+            element.textContent = `Memory Test: Peak = ${result.peak_memory.toFixed(2)}MB, Leak = ${result.memory_leak_detected ? 'DETECTED' : 'None'}`;
+        }
+        
+        function updateFPSResult(result) {
+            const element = document.getElementById('fps-result');
+            element.textContent = `FPS Test: Baseline = ${result.baseline_fps.toFixed(1)}, Stress = ${result.stress_test_fps.toFixed(1)}`;
+        }
+        
+        function updateChaosResult(result) {
+            const element = document.getElementById('chaos-result');
+            element.textContent = `Chaos Test: Stability = ${result.chaos_stability_score.toFixed(1)}, Violations = ${result.violations.length}`;
+        }
+        
+        function updateRecommendations(recommendations) {
+            const section = document.getElementById('recommendations-section');
+            const list = document.getElementById('recommendations-list');
+            
+            if (recommendations && recommendations.length > 0) {
+                section.style.display = 'block';
+                list.innerHTML = recommendations.map(rec => 
+                    `<div class="recommendation-item">• ${rec}</div>`
+                ).join('');
+            } else {
+                section.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

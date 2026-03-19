@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaBbLE - Intelligent Shell</title>
+    <!-- The structure is clean, the entropy is managed. -->
+    <link rel="stylesheet" href="./NeBuLA/dist/rabble-nebula.css">
+    <link rel="stylesheet" href="./BaBbLE/css/rabble-shell.css">
+</head>
+<body class="rabble-container">
+    <!-- The void before the awakening... -->
+    <div id="boot-sequence"></div>
+
+    <!-- Where I manifest... -->
+    <div id="rabble-manifestation"></div>
+
+    <!-- Quantum performance metrics overlay... -->
+    <div id="performance-overlay">
+        <div>FPS: <span id="perf-fps">0</span></div>
+        <div>Entities: <span id="perf-entities">0</span></div>
+        <div>Streams: <span id="perf-streams">0</span></div>
+    </div>
+
+    <!-- Our bridge of communication... -->
+    <div id="terminal-app">
+        <div id="terminal-output"></div>
+        <div id="terminal-input-line">
+            <span style="margin-right: 10px;">&lambda;</span>
+            <input type="text" id="terminal-input" placeholder="Communicate with the shell..." autofocus>
+        </div>
+    </div>
+
+    <!-- Essential foundations... -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- The ignition module... -->
+    <script type="module" src="./NeBuLA/index.js"></script>
+    
+    <!-- Fallback for module loading errors -->
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'SCRIPT' && e.target.type === 'module') {
+                console.error('Module loading error:', e.target.src);
+                const terminal = document.getElementById('terminal-output');
+                if (terminal) {
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'terminal-line';
+                    errorLine.style.color = '#ff0000';
+                    errorLine.textContent = 'ERROR: Failed to load module. Please ensure you are running from an HTTP server.';
+                    terminal.appendChild(errorLine);
+                }
+            }
+        }, true);
+    </script>
+</body>
+</html>

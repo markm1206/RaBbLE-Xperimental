@@ -1,0 +1,169 @@
+/**
+ * RaBbLE Shell CSS - Unified Quantum Theme
+ * All shell styles in one place, extracted from HTML
+ */
+
+:root {
+  /* Quantum Color Palette */
+  --q-cyan: #00ffff;
+  --q-magenta: #ff00ff;
+  --q-purple: #8a2be2;
+  --q-black: #000000;
+  --q-white: #ffffff;
+  
+  /* Glass Effect */
+  --q-glass: rgba(0, 0, 0, 0.7);
+  --q-glass-border: rgba(0, 255, 255, 0.3);
+  
+  /* Typography */
+  --q-font: 'Courier New', Courier, monospace;
+  --q-font-size: 12px;
+  --q-line-height: 1.4;
+  
+  /* Spacing */
+  --q-padding: 10px;
+  --q-margin: 5px;
+  --q-border-radius: 4px;
+  
+  /* Transitions */
+  --q-transition: 1s ease;
+}
+
+/* Base Styles */
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--q-black);
+  color: var(--q-cyan);
+  font-family: var(--q-font);
+}
+
+/* Boot Sequence */
+#boot-sequence {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background: var(--q-black);
+  transition: opacity var(--q-transition), visibility var(--q-transition);
+}
+
+.boot-line {
+  margin: var(--q-margin);
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px var(--q-cyan);
+}
+
+/* Manifestation Container */
+#rabble-manifestation {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Terminal App */
+#terminal-app {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 400px;
+  height: 300px;
+  background: var(--q-glass);
+  border: 1px solid var(--q-glass-border);
+  border-radius: var(--q-border-radius);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--q-transition), transform var(--q-transition);
+}
+
+/* Ignited State */
+.ignited #boot-sequence {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.ignited #terminal-app {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Terminal Output */
+#terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--q-padding);
+  font-size: var(--q-font-size);
+  line-height: var(--q-line-height);
+}
+
+/* Terminal Input */
+#terminal-input-line {
+  display: flex;
+  padding: var(--q-padding);
+  border-top: 1px solid var(--q-glass-border);
+}
+
+#terminal-input {
+  background: transparent;
+  border: none;
+  color: var(--q-cyan);
+  font-family: inherit;
+  font-size: var(--q-font-size);
+  flex: 1;
+  outline: none;
+}
+
+/* Terminal Lines */
+.terminal-line {
+  margin-bottom: var(--q-margin);
+}
+
+.user-cmd {
+  color: var(--q-magenta);
+}
+
+/* Scrollbar Styles */
+#terminal-output::-webkit-scrollbar {
+  width: 4px;
+}
+
+#terminal-output::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#terminal-output::-webkit-scrollbar-thumb {
+  background: var(--q-glass-border);
+}
+
+/* Performance Overlay */
+#performance-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--q-glass);
+  border: 1px solid var(--q-cyan);
+  border-radius: var(--q-border-radius);
+  padding: var(--q-padding);
+  font-size: 11px;
+  color: var(--q-cyan);
+  z-index: 100;
+  min-width: 120px;
+  backdrop-filter: blur(5px);
+}
+
+#performance-overlay div {
+  margin: 3px 0;
+}
+
+#performance-overlay span {
+  color: var(--q-magenta);
+  font-weight: bold;
+}

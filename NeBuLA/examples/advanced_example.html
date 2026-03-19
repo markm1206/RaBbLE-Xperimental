@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaBbLE - Advanced Example</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: Arial, sans-serif; }
+        canvas { display: block; }
+        #ui {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            border: 1px solid #333;
+        }
+        button {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover { background: #555; border-color: #00ffcc; color: #00ffcc; }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div id="ui">
+        <h3>Advanced Controls</h3>
+        <button onclick="createComplexScene()">Create Complex Scene</button>
+        <button onclick="toggleChaos()">Toggle Chaos</button>
+        <button onclick="addSwarm()">Add Swarm</button>
+        <button onclick="combineStreams()">Combine Streams</button>
+        <div id="stats" style="margin-top: 10px; font-size: 12px; color: #888;"></div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "./core/RaBbLE_Nebula_Engine.js": "./core/RaBbLE_Nebula_Engine.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        // Verify Three.js is loaded before proceeding
+        if (typeof THREE === 'undefined') {
+            console.error('Three.js not loaded - required for RaBbLE Nebula Engine');
+            document.getElementById('loading').textContent = 'THREE.JS NOT LOADED';
+            document.getElementById('loading').style.color = '#ff0000';
+            throw new Error('Three.js dependency missing');
+        }
+
+        import { RaBbLE_Nebula_Engine } from './core/RaBbLE_Nebula_Engine.js';
+
+        let engine;
+        let statsEl = document.getElementById('stats');
+        let isChaos = false;
+
+        async function init() {
+            engine = new RaBbLE_Nebula_Engine('#container');
+            
+            // Create a complex scene
+            createComplexScene();
+            engine.start();
+            
+            // Start stats update
+            setInterval(updateStats, 1000);
+        }
+
+        function createComplexScene() {
+            // Create multiple pattern types
+            const organic = engine.createOrganicStream(25, 'SPHERE');
+            const lattice = engine.createLatticeStream(20, 'BOX');
+            const swarm = engine.createSwarmStream(40, 'TETRAHEDRON');
+            const galaxy = engine.createGalaxyStream(30, 'SPHERE');
+            
+            // Combine some streams
+            const combined = engine.combineStreams([organic, swarm]);
+            
+            statsEl.innerHTML = `Created complex scene with 4 pattern types`;
+        }
+
+        function toggleChaos() {
+            isChaos = !isChaos;
+            const intensity = isChaos ? 0.5 : 0.1;
+            engine.updateShaders({ u_base_intensity: intensity });
+            statsEl.innerHTML = `Chaos mode: ${isChaos ? 'ON' : 'OFF'}`;
+        }
+
+        function addSwarm() {
+            engine.createSwarmStream(20, 'TETRAHEDRON');
+            statsEl.innerHTML = 'Added new swarm pattern';
+        }
+
+        function combineStreams() {
+            const runtime = engine.runtime;
+            const streams = Array.from(runtime.q_registry.values());
+            if (streams.length >= 2) {
+                const combined = engine.combineStreams([streams[0], streams[1]]);
+                statsEl.innerHTML = 'Combined first two streams';
+            }
+        }
+
+        function updateStats() {
+            if (!engine) return;
+            const stats = engine.getStats();
+            statsEl.innerHTML = `
+                Entities: ${stats.runtime.entity_count}<br>
+                Streams: ${stats.runtime.stream_count}<br>
+                Shaders: ${stats.shaders.active_materials}
+            `;
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

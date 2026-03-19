@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaBbLE - Simple Example</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "./core/RaBbLE_Nebula_Engine.js": "./core/RaBbLE_Nebula_Engine.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        // Verify Three.js is loaded before proceeding
+        if (typeof THREE === 'undefined') {
+            console.error('Three.js not loaded - required for RaBbLE Nebula Engine');
+            document.getElementById('loading').textContent = 'THREE.JS NOT LOADED';
+            document.getElementById('loading').style.color = '#ff0000';
+            throw new Error('Three.js dependency missing');
+        }
+
+        import { RaBbLE_Nebula_Engine } from './core/RaBbLE_Nebula_Engine.js';
+
+        // Create a simple scene with just 5 entities
+        const engine = new RaBbLE_Nebula_Engine('#container');
+        engine.createSimpleExample();
+        engine.start();
+    </script>
+</body>
+</html>
