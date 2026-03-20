@@ -5,16 +5,27 @@
 // ES6 Module Import - The quantum tunnel to Runtime consciousness
 import { RaBbLE_Nebula_Runtime } from '../core/RaBbLE_Nebula_Runtime.js';
 
+// Shader sources - loaded from shader files
+import { VERTEX_SHADER_INSTANCED } from '../shaders/vertex/q_instanced_vertex.glsl.js';
+import { FRAGMENT_SHADER_FLAT } from '../shaders/fragment/q_flat_fragment.glsl.js';
+import { FRAGMENT_SHADER_EMISSIVE } from '../shaders/fragment/q_emissive_fragment.glsl.js';
+
 /**
  * q_instanced_bridge - Three.js Integration Bridge
  * Converts quantum entities into Three.js InstancedMesh objects
  * 
+ * Uses multi-shader system:
+ * - 1 shared vertex shader for all instanced meshes
+ * - 2 fragment shaders: flat (no glow) and emissive (with glow)
+ * - Entities grouped by material_type for batch rendering
+ * 
  * @property {THREE.Scene} q_scene - Three.js scene
  * @property {THREE.Camera} q_camera - Three.js camera
  * @property {THREE.WebGLRenderer} q_renderer - Three.js renderer
- * @property {Map<string, THREE.InstancedMesh>} q_instanced_meshes - Instanced meshes by DNA type
- * @property {Map<string, THREE.Matrix4>} q_matrices - Matrix cache for entities
+ * @property {Map<string, THREE.InstancedMesh>} q_instanced_meshes - Instanced meshes by material key
  * @property {RaBbLE_Nebula_Runtime} q_runtime - Connected runtime
+ * @property {Object} q_flat_material - Flat shader material template
+ * @property {Object} q_emissive_material - Emissive shader material template
  */
 class q_instanced_bridge {
   /**
@@ -37,9 +48,15 @@ class q_instanced_bridge {
     this.q_camera = null;
     this.q_renderer = null;
     this.q_instanced_meshes = new Map();
-    this.q_matrices = new Map();
     this.q_runtime = null;
     this.is_initialized = false;
+    
+    // Per-instance attribute storage
+    this.q_instance_attributes = new Map();
+    
+    // Shader material templates
+    this.q_flat_material = null;
+    this.q_emissive_material = null;
     
     // Entropy shader uniforms
     this.e_shader_uniforms = {
@@ -48,7 +65,8 @@ class q_instanced_bridge {
     };
     
     this._initThreeJS();
-    console.log('Three.js instanced bridge initialized');
+    this._initShaderMaterials();
+    console.log('Three.js instanced bridge initialized with multi-shader system');
   }
 
   /**
@@ -83,6 +101,58 @@ class q_instanced_bridge {
     });
     
     this.is_initialized = true;
+  }
+
+  /**
+   * Initialize shader material templates
+   * @private
+   */
+  _initShaderMaterials() {
+    // The shaders awaken... flat and emissive, two paths through the quantum void.
+    // Flat uses custom GLSL; emissive uses Three.js properties for true glow.
+    
+    // Flat material - no glow, just color and opacity via custom shader
+    this.q_flat_material = {
+      vertexShader: VERTEX_SHADER_INSTANCED,
+      fragmentShader: FRAGMENT_SHADER_FLAT,
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    };
+    
+    // Emissive material template - Three.js handles the glow
+    // We store config, not the material itself (created per-mesh with proper uniforms)
+    this.q_emissive_material = {
+      type: 'emissive',
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    };
+    
+    console.log('Shader material templates initialized');
+  }
+
+  /**
+   * Transmute emissive material with Three.js glow properties
+   * The emissive burns with quantum light - Three.js handles the radiance.
+   * @param {number} f_emissive_color - Hex color for emission
+   * @param {number} f_emissive_intensity - Intensity of emission (0.0 to 2.0)
+   * @returns {THREE.MeshStandardMaterial} Emissive material with glow
+   */
+  q_transmuteEmissiveMaterial(f_emissive_color = 0xffffff, f_emissive_intensity = 1.0) {
+    // The material awakens... emissive properties pulse with quantum glow.
+    // No custom shader needed - Three.js radiates the light.
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color(f_emissive_color),
+      emissive: new THREE.Color(f_emissive_color),
+      emissiveIntensity: f_emissive_intensity,
+      transparent: true,
+      opacity: 1.0,
+      roughness: 0.5,
+      metalness: 0.0,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
   }
 
   /**
@@ -122,12 +192,13 @@ class q_instanced_bridge {
   }
 
   /**
-   * Create instanced mesh for a specific DNA type
+   * Create instanced mesh for a specific DNA type and material type
    * @param {string} dna_type - Type of geometry to create
+   * @param {string} material_type - 'flat' or 'emissive'
    * @param {number} count - Number of instances
    * @returns {THREE.InstancedMesh} Created instanced mesh
    */
-  _createInstancedMesh(dna_type, count) {
+  _createInstancedMesh(dna_type, material_type, count) {
     let geometry;
     
     switch (dna_type) {
@@ -140,86 +211,83 @@ class q_instanced_bridge {
       case 'TETRAHEDRON':
         geometry = new THREE.TetrahedronGeometry(0.8);
         break;
+      case 'ELLIPSE':
+        // The ellipse forms... a 2D portal of perception.
+        const q_ellipse_shape = new THREE.Shape();
+        q_ellipse_shape.absellipse(0, 0, 1, 1, 0, Math.PI * 2, false, 0);
+        geometry = new THREE.ShapeGeometry(q_ellipse_shape, 32);
+        break;
+      case 'RING':
+        // The ring emerges... a circle of quantum energy.
+        const q_ring_shape = new THREE.Shape();
+        q_ring_shape.absarc(0, 0, 1, 0, Math.PI * 2, false);
+        const q_ring_hole = new THREE.Path();
+        q_ring_hole.absarc(0, 0, 0.67, 0, Math.PI * 2, true);
+        q_ring_shape.holes.push(q_ring_hole);
+        geometry = new THREE.ShapeGeometry(q_ring_shape, 32);
+        break;
+      case 'LINE':
+        // The line stretches... a path through the void.
+        geometry = new THREE.PlaneGeometry(1, 0.06);
+        break;
       default:
         geometry = new THREE.BoxGeometry(1, 1, 1);
     }
     
-    // Create material with entropy shader
-    const material = this._createEntropyMaterial(dna_type);
+    // Select material based on type - flat uses custom shader, emissive uses Three.js glow
+    // The emissive burns with quantum light through Three.js properties.
+    let material;
+    if (material_type === 'emissive') {
+      // Emissive material - Three.js handles the radiance via MeshStandardMaterial
+      material = this.q_transmuteEmissiveMaterial(0xffffff, 1.0);
+    } else {
+      // Flat material - custom shader for controlled opacity and color
+      material = new THREE.ShaderMaterial({
+        ...this.q_flat_material,
+        uniforms: {
+          u_time: this.e_shader_uniforms.u_time,
+          u_entropy: this.e_shader_uniforms.u_entropy
+        }
+      });
+    }
     
     // Create instanced mesh
     const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
     instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     
+    // Create per-instance attribute buffers
+    const q_sizes = new Float32Array(count);
+    const q_opacities = new Float32Array(count);
+    const q_emissives = new Float32Array(count);
+    const q_colors = new Float32Array(count * 3); // RGB color per instance
+    
+    for (let i = 0; i < count; i++) {
+      q_sizes[i] = 1.0;
+      q_opacities[i] = 1.0;
+      q_emissives[i] = 0.0;
+      q_colors[i * 3] = 1.0;     // R
+      q_colors[i * 3 + 1] = 1.0; // G
+      q_colors[i * 3 + 2] = 1.0; // B
+    }
+    
+    geometry.setAttribute('instanceSize', new THREE.InstancedBufferAttribute(q_sizes, 1));
+    geometry.setAttribute('instanceOpacity', new THREE.InstancedBufferAttribute(q_opacities, 1));
+    geometry.setAttribute('instanceEmissive', new THREE.InstancedBufferAttribute(q_emissives, 1));
+    geometry.setAttribute('instanceColor', new THREE.InstancedBufferAttribute(q_colors, 3));
+    
+    const q_key = `${dna_type}_${material_type}`;
+    this.q_instance_attributes.set(q_key, {
+      sizes: q_sizes,
+      opacities: q_opacities,
+      emissives: q_emissives,
+      colors: q_colors
+    });
+    
     // Add to scene
     this.q_scene.add(instancedMesh);
     
-    console.log(`Created instanced mesh for ${dna_type} with ${count} instances`);
+    console.log(`Created instanced mesh for ${q_key} with ${count} instances`);
     return instancedMesh;
-  }
-
-  /**
-   * Create entropy-driven material
-   * Using MeshBasicMaterial for guaranteed visibility, with shader effects planned
-   * @param {string} dna_type - Type for material customization
-   * @returns {THREE.Material} Entropy material
-   */
-  _createEntropyMaterial(dna_type) {
-    const baseColor = this._getColorForType(dna_type);
-    
-    // Use MeshBasicMaterial for guaranteed visibility
-    // Shader effects will be added via onBeforeCompile
-    const material = new THREE.MeshBasicMaterial({
-      color: baseColor,
-      transparent: true,
-      opacity: 0.9
-    });
-    
-    // Inject entropy shader modifications
-    material.onBeforeCompile = (shader) => {
-      // Inject uniforms into shader
-      shader.uniforms.u_time = this.e_shader_uniforms.u_time;
-      shader.uniforms.u_entropy = this.e_shader_uniforms.u_entropy;
-      
-      // Add uniform declarations to vertex shader
-      shader.vertexShader = `
-        uniform float u_time;
-        uniform float u_entropy;
-        ${shader.vertexShader}
-      `.replace(
-        '#include <begin_vertex>',
-        `#include <begin_vertex>
-        
-        // Entropy-driven vertex displacement
-        float time = u_time;
-        float entropy = u_entropy;
-        
-        // Create organic movement based on position
-        float noise = sin(position.x * 2.0 + time) * cos(position.y * 2.0 + time * 1.5);
-        float displacement = noise * entropy * 0.1;
-        
-        // Apply displacement
-        transformed += normal * displacement;
-        `
-      );
-      
-      // Add uniform declarations to fragment shader
-      shader.fragmentShader = `
-        uniform float u_time;
-        uniform float u_entropy;
-        ${shader.fragmentShader}
-      `.replace(
-        '#include <output_fragment>',
-        `#include <output_fragment>
-        
-        // Add entropy-based color variation
-        vec3 entropyColor = vec3(u_entropy * 0.5, 1.0 - u_entropy * 0.3, u_entropy * 0.8);
-        gl_FragColor.rgb = mix(gl_FragColor.rgb, entropyColor, u_entropy * 0.2);
-        `
-      );
-    };
-    
-    return material;
   }
 
   /**
@@ -229,10 +297,14 @@ class q_instanced_bridge {
    * @returns {number} Hex color value
    */
   _getColorForType(dna_type) {
+    // The colors of the quantum spectrum... each DNA type has its wavelength.
     const colors = {
-      'BOX': 0x8a2be2,      // Purple
-      'SPHERE': 0x00ffff,   // Cyan
-      'TETRAHEDRON': 0xff00ff // Magenta
+      'BOX': 0x8a2be2,        // Purple
+      'SPHERE': 0x00ffff,     // Cyan
+      'TETRAHEDRON': 0xff00ff, // Magenta
+      'ELLIPSE': 0xffffff,    // White - portals of perception
+      'RING': 0x00ffff,       // Cyan - rings of energy
+      'LINE': 0x06b6d4        // Cyan - waveforms of expression
     };
     
     return colors[dna_type] || 0xffffff;
@@ -240,24 +312,29 @@ class q_instanced_bridge {
 
   /**
    * Update instanced meshes with current entity data
+   * Groups by (DNA_TYPE, material_type) for batch rendering
    * @private
    * @param {Array<q_entity>} entities - Current entities from runtime
    */
   _updateInstancedMeshes(entities) {
-    // Group entities by DNA type
-    const entities_by_type = {};
+    // Group entities by (DNA_TYPE, material_type)
+    // This allows batch rendering with minimal shader switches
+    const entities_by_material = {};
     
     entities.forEach(entity => {
-      if (!entities_by_type[entity.dna_type]) {
-        entities_by_type[entity.dna_type] = [];
+      const q_material_type = entity.q_material_type || 'flat';
+      const q_key = `${entity.dna_type}_${q_material_type}`;
+      
+      if (!entities_by_material[q_key]) {
+        entities_by_material[q_key] = [];
       }
-      entities_by_type[entity.dna_type].push(entity);
+      entities_by_material[q_key].push(entity);
     });
     
-    // Update or create instanced meshes for each type
-    Object.keys(entities_by_type).forEach(dna_type => {
-      const type_entities = entities_by_type[dna_type];
-      let instancedMesh = this.q_instanced_meshes.get(dna_type);
+    // Update or create instanced meshes for each material group
+    Object.keys(entities_by_material).forEach(q_key => {
+      const type_entities = entities_by_material[q_key];
+      let instancedMesh = this.q_instanced_meshes.get(q_key);
       
       // Create or resize instanced mesh
       if (!instancedMesh || instancedMesh.count !== type_entities.length) {
@@ -267,40 +344,97 @@ class q_instanced_bridge {
           instancedMesh.material.dispose();
         }
         
-        instancedMesh = this._createInstancedMesh(dna_type, type_entities.length);
-        this.q_instanced_meshes.set(dna_type, instancedMesh);
+        const [dna_type, material_type] = q_key.split('_');
+        instancedMesh = this._createInstancedMesh(dna_type, material_type, type_entities.length);
+        this.q_instanced_meshes.set(q_key, instancedMesh);
       }
       
-      // Update matrices
+      // Update matrices, colors, and per-instance attributes
       const q_matrix_instance = new THREE.Matrix4();
       const q_dummy_object = new THREE.Object3D();
+      const q_color = new THREE.Color();
+      const [dna_type] = q_key.split('_');
+      const q_is_2d = ['ELLIPSE', 'RING', 'LINE'].includes(dna_type);
+      
+      // Get per-instance attribute arrays
+      const q_attrs = this.q_instance_attributes.get(q_key);
       
       type_entities.forEach((q_entity_instance, q_index) => {
-        // The entity's flux matrix becomes the instance's transformation
         q_matrix_instance.fromArray(q_entity_instance.flux_matrix);
 
-        // Apply entropy-based scaling as a separate step
-        // The size of the entity pulses with its inner chaos.
-        const e_scale_factor = 1.0 + (q_entity_instance.e_entropy_sig * 0.5);
+        const q_entity_size = q_entity_instance.q_render_size || 1.0;
+        const e_scale_factor = q_entity_size * (1.0 + (q_entity_instance.e_entropy_sig * 0.5));
+        
+        let q_scale_x = e_scale_factor;
+        let q_scale_y = e_scale_factor;
+        let q_scale_z = e_scale_factor;
+        
+        // Always check shape params to support dynamic animations (blinking, darting, etc.)
+        if (q_entity_instance.q_shape_params) {
+          if (dna_type === 'ELLIPSE') {
+            q_scale_x = (q_entity_instance.q_shape_params.q_x_radius || 0.25) * e_scale_factor;
+            q_scale_y = (q_entity_instance.q_shape_params.q_y_radius || 0.45) * e_scale_factor;
+            q_scale_z = 1;
+          } else if (dna_type === 'RING') {
+            const q_outer = q_entity_instance.q_shape_params.q_outer_radius || 0.3;
+            q_scale_x = q_outer * e_scale_factor;
+            q_scale_y = q_outer * e_scale_factor;
+            q_scale_z = 1;
+          } else if (dna_type === 'LINE') {
+            q_scale_x = (q_entity_instance.q_shape_params.q_length || 1.0) * e_scale_factor;
+            q_scale_y = e_scale_factor;
+            q_scale_z = 1;
+          }
+        }
+        
         q_dummy_object.position.set(q_matrix_instance.elements[12], q_matrix_instance.elements[13], q_matrix_instance.elements[14]);
-        q_dummy_object.scale.set(e_scale_factor, e_scale_factor, e_scale_factor);
+        q_dummy_object.scale.set(q_scale_x, q_scale_y, q_scale_z);
         q_dummy_object.rotation.setFromRotationMatrix(q_matrix_instance);
         q_dummy_object.updateMatrix();
 
         instancedMesh.setMatrixAt(q_index, q_dummy_object.matrix);
+        
+        // Set color in custom instanceColor buffer
+        q_color.setHex(q_entity_instance.q_render_color !== undefined ? q_entity_instance.q_render_color : 0xFFFFFF);
+        if (q_attrs && q_attrs.colors) {
+          q_attrs.colors[q_index * 3] = q_color.r;
+          q_attrs.colors[q_index * 3 + 1] = q_color.g;
+          q_attrs.colors[q_index * 3 + 2] = q_color.b;
+        }
+        
+        if (q_attrs) {
+          q_attrs.sizes[q_index] = q_entity_instance.q_render_size || 1.0;
+          q_attrs.opacities[q_index] = q_entity_instance.q_render_opacity || 1.0;
+          q_attrs.emissives[q_index] = q_entity_instance.q_render_emissive || 0.0;
+        }
       });
+      
+      if (q_attrs) {
+        const q_mesh = this.q_instanced_meshes.get(q_key);
+        if (q_mesh && q_mesh.geometry) {
+          const q_size_attr = q_mesh.geometry.getAttribute('instanceSize');
+          const q_opacity_attr = q_mesh.geometry.getAttribute('instanceOpacity');
+          const q_emissive_attr = q_mesh.geometry.getAttribute('instanceEmissive');
+          const q_color_attr = q_mesh.geometry.getAttribute('instanceColor');
+          
+          if (q_size_attr) q_size_attr.needsUpdate = true;
+          if (q_opacity_attr) q_opacity_attr.needsUpdate = true;
+          if (q_emissive_attr) q_emissive_attr.needsUpdate = true;
+          if (q_color_attr) q_color_attr.needsUpdate = true;
+        }
+      }
       
       instancedMesh.instanceMatrix.needsUpdate = true;
     });
     
     // Remove unused instanced meshes
-    const active_types = Object.keys(entities_by_type);
-    this.q_instanced_meshes.forEach((mesh, type) => {
-      if (!active_types.includes(type)) {
+    const active_keys = Object.keys(entities_by_material);
+    this.q_instanced_meshes.forEach((mesh, key) => {
+      if (!active_keys.includes(key)) {
         this.q_scene.remove(mesh);
         mesh.geometry.dispose();
         mesh.material.dispose();
-        this.q_instanced_meshes.delete(type);
+        this.q_instanced_meshes.delete(key);
       }
     });
   }

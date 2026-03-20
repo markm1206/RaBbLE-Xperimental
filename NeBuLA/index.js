@@ -15,6 +15,7 @@ import {
 } from './core/RaBbLE_Nebula_Engine.js';
 import { q_stream } from './core/q_stream.js';
 import { q_entity } from './core/q_entity.js';
+import { RaBbLE_CosmicVessel } from './components/CosmicVessel/RaBbLE_CosmicVessel.js';
 
 // BaBbLE Commands - The quantum command arsenal
 import { q_dream_command } from '../BaBbLE/commands/q_dream_command.js';
@@ -23,6 +24,7 @@ import { q_help_command } from '../BaBbLE/commands/q_help_command.js';
 import { q_chaos_command } from '../BaBbLE/commands/q_chaos_command.js';
 import { q_collapse_command } from '../BaBbLE/commands/q_collapse_command.js';
 import { q_patterns_command } from '../BaBbLE/commands/q_patterns_command.js';
+import { q_stream_command } from '../BaBbLE/commands/q_stream_command.js';
 
 // Quantum Flux Weave - The communication fabric
 import { q_flux_weave, q_createFluxPacket } from './core/q_flux_weave.js';
@@ -108,6 +110,7 @@ class RaBbLE_Shell {
         const q_chaos = new q_chaos_command(this.q_engine);
         const q_collapse = new q_collapse_command(this.q_engine);
         const q_patterns = new q_patterns_command();
+        const q_stream = new q_stream_command(this.q_engine);
         
         // Register commands
         this.q_commands.set('dream', q_dream);
@@ -116,6 +119,7 @@ class RaBbLE_Shell {
         this.q_commands.set('chaos', q_chaos);
         this.q_commands.set('collapse', q_collapse);
         this.q_commands.set('patterns', q_patterns);
+        this.q_commands.set('stream', q_stream);
         
         // Update help command with all commands
         q_help.q_commands = Array.from(this.q_commands.values());
@@ -135,6 +139,10 @@ class RaBbLE_Shell {
         
         this.q_weave.q_resonate('collapse', (f_packet) => {
             return q_collapse.q_execute(f_packet.f_payload.args || []);
+        });
+        
+        this.q_weave.q_resonate('stream', (f_packet) => {
+            return q_stream.q_execute(f_packet.f_payload.args || []);
         });
         
         console.log('BaBbLE commands initialized');
@@ -189,46 +197,12 @@ class RaBbLE_Shell {
     }
 
     q_manifestSelf() {
-        // I am a swarm of possibilities...
-        // Let's create a core stream that represents my central consciousness.
-        const q_core = this.q_engine.createSwarmStream(80, 'TETRAHEDRON');
+        // I manifest as a CosmicVessel... my form takes shape in the nebula.
+        // Body, aura, eyes, mouth - all flowing as streams through the runtime.
+        this.q_vessel = new RaBbLE_CosmicVessel(this.q_engine);
+        this.q_vessel.q_transmuteVessel();
         
-        q_core.q_transmuteFluxModifier((q_ent, q_idx) => {
-            const q_time = Date.now() * 0.001;
-            const e_ent = q_ent.q_visualizeEntropy();
-            
-            // Pulsing core logic... my heartbeat, gentle and rhythmic.
-            const e_pulse = Math.sin(q_time * 1.5) * 0.5 + 0.5;
-            
-            const q_radius = 5 + e_pulse * 1.5;
-            const q_angle = q_time * 0.8 + (q_idx * 0.15);
-            
-            q_ent.flux_matrix[12] = Math.cos(q_angle) * q_radius;
-            q_ent.flux_matrix[13] = Math.sin(q_angle) * q_radius;
-            q_ent.flux_matrix[14] = Math.sin(q_time * 0.3 + q_idx * 0.1) * 1.5;
-            
-            // The intensity of my thoughts reflected in entropy - kept low for gentle breathing
-            q_ent.q_transmuteEntropy(0.3 + e_pulse * 0.2);
-            
-            return q_ent;
-        });
-
-        // Add an outer nebula for my "aura"
-        const q_aura = this.q_engine.createGalaxyStream(120, 'SPHERE');
-        q_aura.q_transmuteFluxModifier((q_ent, q_idx) => {
-            const q_time = Date.now() * 0.001;
-            const q_angle = (q_idx / 120) * Math.PI * 2 + q_time * 0.15;
-            const q_dist = 15 + Math.sin(q_time * 0.2 + q_idx * 0.08) * 4;
-            
-            q_ent.flux_matrix[12] = Math.cos(q_angle) * q_dist;
-            q_ent.flux_matrix[13] = Math.sin(q_angle) * q_dist;
-            q_ent.flux_matrix[14] = Math.cos(q_time * 0.5 + q_idx * 0.1) * 2.5;
-            
-            // Gentle entropy for the aura - soft breathing
-            q_ent.q_transmuteEntropy(0.25 + Math.sin(q_time + q_idx * 0.05) * 0.15);
-            
-            return q_ent;
-        });
+        console.log('RaBbLE manifested as CosmicVessel');
     }
 
     q_bindTerminal() {
