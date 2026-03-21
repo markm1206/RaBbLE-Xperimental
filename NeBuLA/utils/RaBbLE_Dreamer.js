@@ -430,33 +430,176 @@ class RaBbLE_Dreamer {
       case 'organic':
         return (entity, index) => {
           const time = Date.now() * 0.001;
-          const pulse = Math.sin(time + index * 0.2) * 0.5 + 0.5;
+          
+          // Pulsing growth pattern
+          const pulse = Math.sin(time * 1.5 + index * 0.2) * 0.5 + 0.5;
+          const grow = Math.sin(time * 0.5 + index * 0.1) * 0.3;
+          
+          // Apply position oscillation
+          entity.flux_matrix[13] += Math.sin(time + index * 0.3) * 0.02;
+          
+          // Vary size and emissive
+          entity.q_render_size = (0.5 + Math.random() * 1.5) * (1 + grow * 0.2);
+          entity.q_render_emissive = 0.3 + pulse * 0.7;
+          
           entity.q_transmuteEntropy(pulse * entity.e_entropy_sig);
           return entity;
         };
         
       case 'lattice':
         return (entity, index) => {
-          // Minimal movement for structure
-          entity.q_transmuteEntropy(entity.e_entropy_sig * 0.1);
+          const time = Date.now() * 0.001;
+          
+          // Breathing lattice pattern
+          const breathe = Math.sin(time * 0.8 + index * 0.05) * 0.2;
+          const pulse = Math.sin(time * 2 + index * 0.1) * 0.1;
+          
+          // Apply subtle position oscillation
+          entity.flux_matrix[12] += breathe * 0.01;
+          entity.flux_matrix[13] += pulse * 0.01;
+          
+          // Vary emissive with breathing
+          entity.q_render_emissive = 0.2 + Math.abs(breathe) * 0.5;
+          
+          entity.q_transmuteEntropy(entity.e_entropy_sig * (0.1 + Math.abs(breathe) * 0.2));
           return entity;
         };
         
       case 'swarm':
         return (entity, index) => {
-          // Chaotic movement
           const time = Date.now() * 0.001;
-          const chaos = Math.sin(time * 2 + index) * Math.cos(time * 1.5 + index * 2);
-          entity.q_transmuteEntropy((chaos + 1) * 0.5 * entity.e_entropy_sig);
+          
+          // Chaotic swarm movement
+          const chaos1 = Math.sin(time * 2 + index) * Math.cos(time * 1.5 + index * 2);
+          const chaos2 = Math.cos(time * 1.8 + index * 0.5) * Math.sin(time * 2.2 + index * 1.5);
+          
+          // Apply chaotic position movement
+          entity.flux_matrix[12] += chaos1 * 0.03;
+          entity.flux_matrix[13] += chaos2 * 0.03;
+          entity.flux_matrix[14] += (chaos1 + chaos2) * 0.02;
+          
+          // Vary size with chaos
+          entity.q_render_size = (0.3 + Math.random() * 1.7) * (1 + Math.abs(chaos1) * 0.3);
+          
+          // Vary emissive with chaos
+          entity.q_render_emissive = 0.4 + Math.abs(chaos2) * 0.6;
+          
+          entity.q_transmuteEntropy((chaos1 + 1) * 0.5 * entity.e_entropy_sig);
           return entity;
         };
         
       case 'galaxy':
         return (entity, index) => {
-          // Rotational movement
           const time = Date.now() * 0.001;
+          
+          // Rotational movement with wave
           const rotation = Math.sin(time * 0.5 + index * 0.1);
+          const wave = Math.sin(time * 1.2 + index * 0.05) * 0.2;
+          
+          // Apply rotation to position
+          const angle = time * 0.1 + index * 0.01;
+          const radius = Math.sqrt(entity.flux_matrix[12] ** 2 + entity.flux_matrix[13] ** 2);
+          entity.flux_matrix[12] = Math.cos(angle) * radius;
+          entity.flux_matrix[13] = Math.sin(angle) * radius;
+          
+          // Apply vertical wave
+          entity.flux_matrix[14] += wave * 0.05;
+          
+          // Vary emissive with rotation
+          entity.q_render_emissive = 0.5 + Math.abs(rotation) * 0.5;
+          
           entity.q_transmuteEntropy(rotation * entity.e_entropy_sig * 0.3);
+          return entity;
+        };
+        
+      case 'vortex':
+        return (entity, index) => {
+          const time = Date.now() * 0.001;
+          
+          // Spiral movement
+          const spin = Math.sin(time * 2 + index * 0.1) * 0.5;
+          const pulse = Math.sin(time * 3 + index * 0.2) * 0.3;
+          
+          // Apply spiral position movement
+          const angle = time * 0.3 + index * 0.05;
+          const currentRadius = Math.sqrt(entity.flux_matrix[12] ** 2 + entity.flux_matrix[13] ** 2);
+          const newRadius = currentRadius * (1 + spin * 0.1);
+          entity.flux_matrix[12] = Math.cos(angle) * newRadius;
+          entity.flux_matrix[13] = Math.sin(angle) * newRadius;
+          
+          // Apply vertical oscillation
+          entity.flux_matrix[14] += pulse * 0.1;
+          
+          // Vary emissive with spin
+          entity.q_render_emissive = 0.4 + Math.abs(spin) * 0.6;
+          
+          entity.q_transmuteEntropy(0.4 + spin);
+          return entity;
+        };
+        
+      case 'fractal':
+        return (entity, index) => {
+          const time = Date.now() * 0.001;
+          
+          // Fractal pulsing
+          const pulse = Math.sin(time + index * 0.05) * 0.2;
+          const branch = Math.sin(time * 0.7 + index * 0.1) * 0.15;
+          
+          // Apply subtle position oscillation
+          entity.flux_matrix[12] += branch * 0.02;
+          entity.flux_matrix[13] += pulse * 0.02;
+          
+          // Vary emissive with pulse
+          entity.q_render_emissive = 0.3 + Math.abs(pulse) * 0.7;
+          
+          entity.q_transmuteEntropy(0.3 + pulse);
+          return entity;
+        };
+        
+      case 'explosion':
+        return (entity, index) => {
+          const time = Date.now() * 0.001;
+          
+          // Expanding burst
+          const expand = Math.sin(time * 3 + index * 0.1) * 0.3;
+          const pulse = Math.sin(time * 4 + index * 0.2) * 0.2;
+          
+          // Apply expansion to position
+          const direction = Math.atan2(entity.flux_matrix[13], entity.flux_matrix[12]);
+          entity.flux_matrix[12] += Math.cos(direction) * expand * 0.05;
+          entity.flux_matrix[13] += Math.sin(direction) * expand * 0.05;
+          
+          // Vary size with expansion
+          entity.q_render_size = (0.2 + Math.random() * 0.5) * (1 + Math.abs(expand) * 0.5);
+          
+          // Vary emissive with pulse
+          entity.q_render_emissive = 0.5 + Math.abs(pulse) * 0.5;
+          
+          entity.q_transmuteEntropy(0.5 + expand);
+          return entity;
+        };
+        
+      case 'spiral':
+        return (entity, index) => {
+          const time = Date.now() * 0.001;
+          
+          // Spiral rotation with pulse
+          const rotate = Math.sin(time + index * 0.02) * 0.25;
+          const pulse = Math.sin(time * 1.5 + index * 0.05) * 0.15;
+          
+          // Apply rotation to position
+          const angle = time * 0.05 + index * 0.01;
+          const currentRadius = Math.sqrt(entity.flux_matrix[12] ** 2 + entity.flux_matrix[13] ** 2);
+          entity.flux_matrix[12] = Math.cos(angle) * currentRadius;
+          entity.flux_matrix[13] = Math.sin(angle) * currentRadius;
+          
+          // Apply vertical oscillation
+          entity.flux_matrix[14] += pulse * 0.08;
+          
+          // Vary emissive with rotation
+          entity.q_render_emissive = 0.35 + Math.abs(rotate) * 0.65;
+          
+          entity.q_transmuteEntropy(0.35 + rotate);
           return entity;
         };
         

@@ -43,7 +43,32 @@ class RaBbLE_CosmicVessel {
     this.q_time = 0;
     this.q_is_manifested = false;
     
+    // Mouse tracking for eye movement
+    this.q_mouse_x = 0;
+    this.q_mouse_y = 0;
+    this.q_target_pupil_x = 0;
+    this.q_target_pupil_y = 0;
+    this.q_current_pupil_x = 0;
+    this.q_current_pupil_y = 0;
+    
+    // Initialize mouse tracking
+    this._initMouseTracking();
+    
     console.log('RaBbLE_CosmicVessel initialized - Ready to manifest');
+  }
+
+  /**
+   * Initialize mouse tracking for eye movement
+   * The vessel perceives... eyes follow the cursor through the void.
+   * @private
+   */
+  _initMouseTracking() {
+    // The vessel awakens its perception... tracking the creator's gaze.
+    document.addEventListener('mousemove', (e) => {
+      // Normalize mouse position to -1 to 1 range
+      this.q_mouse_x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.q_mouse_y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
   }
 
   /**
@@ -318,65 +343,82 @@ class RaBbLE_CosmicVessel {
     q_createEyeEntities('left');
     q_createEyeEntities('right');
     
-    // Apply eye-specific flux modifier - blinking and darting for lifelike feel
+    // Apply eye-specific flux modifier - blinking and mouse tracking for lifelike feel
     q_stream_instance.q_transmuteFluxModifier((f_entity, f_index) => {
       const q_time = this.q_time;
       
       // Only animate eye whites (emissive ELLIPSE entities)
       if (f_entity.dna_type === 'ELLIPSE' && f_entity.q_render_emissive > 0) {
-        // Blinking: periodic vertical squish every 3-5 seconds
-        const q_blink_cycle = 4.0 + Math.sin(f_index * 1.7) * 1.0; // Vary blink timing per eye
+        // Store original position if not already stored
+        if (!f_entity.q_original_position) {
+          const q_is_left_eye = f_index < 3; // First 3 entities are left eye
+          f_entity.q_original_position = {
+            x: q_is_left_eye ? q_eye_config.q_left_position.x : q_eye_config.q_right_position.x,
+            y: q_is_left_eye ? q_eye_config.q_left_position.y : q_eye_config.q_right_position.y,
+            z: 0
+          };
+          f_entity.q_current_position = { ...f_entity.q_original_position };
+        }
+        
+        // Fast blinking: quick close/open every 2-3 seconds
+        const q_blink_cycle = 2.5 + Math.sin(f_index * 1.7) * 0.5; // 2-3 second cycle
         const q_blink_phase = (q_time % q_blink_cycle) / q_blink_cycle;
         
-        // Blink curve: quick close (0.0-0.1), hold (0.1-0.2), quick open (0.2-0.3)
+        // Fast blink curve: quick close (0.0-0.05), hold (0.05-0.1), quick open (0.1-0.15)
         let q_blink_scale = 1.0;
-        if (q_blink_phase < 0.1) {
-          // Closing
-          q_blink_scale = 1.0 - (q_blink_phase / 0.1) * 0.7;
+        if (q_blink_phase < 0.05) {
+          // Closing - very fast
+          q_blink_scale = 1.0 - (q_blink_phase / 0.05) * 0.9; // Scale to 0.1
+        } else if (q_blink_phase < 0.1) {
+          // Closed - minimal height
+          q_blink_scale = 0.1;
         } else if (q_blink_phase < 0.15) {
-          // Closed
-          q_blink_scale = 0.3;
-        } else if (q_blink_phase < 0.25) {
-          // Opening
-          q_blink_scale = 0.3 + ((q_blink_phase - 0.15) / 0.1) * 0.7;
+          // Opening - very fast
+          q_blink_scale = 0.1 + ((q_blink_phase - 0.1) / 0.05) * 0.9;
         }
         
-        // Darting: random eye movement every 2-6 seconds
-        const q_dart_cycle = 3.0 + Math.sin(f_index * 2.3) * 1.5;
-        const q_dart_phase = (q_time % q_dart_cycle) / q_dart_cycle;
+        // Mouse tracking: eyes follow the cursor
+        // Smooth interpolation toward target position
+        const q_lerp_speed = 0.08;
+        this.q_current_pupil_x += (this.q_mouse_x - this.q_current_pupil_x) * q_lerp_speed;
+        this.q_current_pupil_y += (this.q_mouse_y - this.q_current_pupil_y) * q_lerp_speed;
         
-        let q_dart_x = 0;
-        let q_dart_y = 0;
+        // Calculate eye offset based on mouse position
+        const q_eye_offset_x = this.q_current_pupil_x * 0.15; // Max 0.15 units horizontal
+        const q_eye_offset_y = this.q_current_pupil_y * 0.1;  // Max 0.1 units vertical
         
-        if (q_dart_phase < 0.1) {
-          // Dart to random position
-          const q_dart_angle = Math.sin(q_time * 0.7 + f_index) * Math.PI;
-          const q_dart_dist = 0.08 + Math.random() * 0.04;
-          q_dart_x = Math.cos(q_dart_angle) * q_dart_dist;
-          q_dart_y = Math.sin(q_dart_angle) * q_dart_dist;
+        // Calculate target position with mouse offset
+        const q_target_x = f_entity.q_original_position.x + q_eye_offset_x;
+        const q_target_y = f_entity.q_original_position.y + q_eye_offset_y;
+        
+        // Smoothly interpolate current position toward target
+        f_entity.q_current_position.x += (q_target_x - f_entity.q_current_position.x) * q_lerp_speed;
+        f_entity.q_current_position.y += (q_target_y - f_entity.q_current_position.y) * q_lerp_speed;
+        
+        // Apply position to flux_matrix
+        f_entity.flux_matrix[12] = f_entity.q_current_position.x;
+        f_entity.flux_matrix[13] = f_entity.q_current_position.y;
+        
+        // Apply blink using flux_matrix scale (Y-axis squish)
+        // Store original scale if not stored
+        if (!f_entity.q_original_scale) {
+          f_entity.q_original_scale = {
+            x: q_eye_config.q_x_radius,
+            y: q_eye_config.q_y_radius
+          };
         }
         
-        // Apply blink to y_radius
-        const q_base_y = q_eye_config.q_y_radius;
-        f_entity.q_transmuteShapeParams({
-          q_y_radius: q_base_y * q_blink_scale
-        });
-        
-        // Apply dart offset to position
-        f_entity.flux_matrix[12] += q_dart_x * 0.1;
-        f_entity.flux_matrix[13] += q_dart_y * 0.1;
-        
-        // Keep eye within bounds (return to center)
-        const q_center_x = f_index < 3 ? q_eye_config.q_left_position.x : q_eye_config.q_right_position.x;
-        const q_center_y = f_index < 3 ? q_eye_config.q_left_position.y : q_eye_config.q_right_position.y;
-        f_entity.flux_matrix[12] += (q_center_x - f_entity.flux_matrix[12]) * 0.05;
-        f_entity.flux_matrix[13] += (q_center_y - f_entity.flux_matrix[13]) * 0.05;
+        // Apply blink scale to Y-axis using flux_matrix
+        // Scale components are at indices 0 (X), 5 (Y), 10 (Z) on diagonal
+        f_entity.flux_matrix[0] = f_entity.q_original_scale.x; // Keep X scale
+        f_entity.flux_matrix[5] = f_entity.q_original_scale.y * q_blink_scale; // Squish Y
+        f_entity.flux_matrix[10] = 1.0; // Keep Z scale
       }
       
       return f_entity;
     });
     
-    console.log('Eye stream created with 6 ellipse entities (3 per eye)');
+    console.log('Eye stream created with 6 ellipse entities (3 per eye) - mouse tracking enabled');
     return q_stream_instance;
   }
 
@@ -386,52 +428,111 @@ class RaBbLE_CosmicVessel {
    * @returns {q_stream} The mouth stream
    */
   _transmuteMouthStream() {
-    // The mouth forms... a waveform of expression.
-    // Multiple particles spread in a curved line create the mouth shape.
+    // The mouth forms... a waveform of expression emerges from the void.
+    // Lines in 3D space create a living mouth effect with wave pulses.
     const q_stream_instance = new q_stream('cosmic_mouth');
     const q_mouth_config = this.q_config.q_mouth;
     
-    // Create particles along a curved mouth shape
-    const q_mouth_particle_count = 20;
+    // Create multiple waveform lines for a more visible mouth
+    const q_waveform_lines = 5; // Multiple parallel lines for depth
+    const q_points_per_line = 15; // Points along each line
     const q_mouth_width = q_mouth_config.q_x_range || 1.5;
     
-    for (let i = 0; i < q_mouth_particle_count; i++) {
-      const q_mouth_entity = new q_entity('SPHERE');
-      
-      // Spread particles along a curve (smile shape)
-      const q_t = i / (q_mouth_particle_count - 1); // 0 to 1
-      const q_x = (q_t - 0.5) * q_mouth_width;
-      
-      // Curved y position (smile curve)
-      const q_curve = Math.sin(q_t * Math.PI) * 0.2;
-      const q_y = q_mouth_config.q_position.y - q_curve;
-      
-      q_mouth_entity.flux_matrix[12] = q_mouth_config.q_position.x + q_x;
-      q_mouth_entity.flux_matrix[13] = q_y;
-      q_mouth_entity.flux_matrix[14] = q_mouth_config.q_position.z;
-      
-      // Small random spread for organic look
-      q_mouth_entity.flux_matrix[12] += (Math.random() - 0.5) * 0.1;
-      q_mouth_entity.flux_matrix[13] += (Math.random() - 0.5) * 0.05;
-      
-      q_mouth_entity.q_transmuteRenderColor(this.q_config.q_colors.mouth.q_primary);
-      q_mouth_entity.q_render_size = 0.1 + Math.random() * 0.1;
-      q_mouth_entity.q_render_emissive = 0.6 + Math.random() * 0.3;
-      q_mouth_entity.q_transmuteEntropySignature(0.2 + Math.random() * 0.2);
-      q_mouth_entity.q_transmuteRenderOrder(10);
-      
-      q_stream_instance.q_transmuteEntity(q_mouth_entity);
+    for (let q_line = 0; q_line < q_waveform_lines; q_line++) {
+      for (let i = 0; i < q_points_per_line; i++) {
+        const q_mouth_entity = new q_entity('LINE');
+        
+        // Position along the mouth curve
+        const q_t = i / (q_points_per_line - 1); // 0 to 1
+        const q_x = (q_t - 0.5) * q_mouth_width;
+        
+        // Base Y position with wave offset
+        const q_base_y = q_mouth_config.q_position.y;
+        const q_z_offset = (q_line - q_waveform_lines / 2) * 0.05; // Depth variation
+        
+        // Store wave parameters for animation
+        q_mouth_entity.q_wave_index = i;
+        q_mouth_entity.q_wave_line = q_line;
+        q_mouth_entity.q_wave_t = q_t;
+        q_mouth_entity.q_base_y = q_base_y;
+        q_mouth_entity.q_wave_amplitude = 0.15 + Math.random() * 0.1;
+        q_mouth_entity.q_wave_frequency = 2 + Math.random() * 2;
+        q_mouth_entity.q_wave_phase = Math.random() * Math.PI * 2;
+        
+        q_mouth_entity.flux_matrix[12] = q_mouth_config.q_position.x + q_x;
+        q_mouth_entity.flux_matrix[13] = q_base_y;
+        q_mouth_entity.flux_matrix[14] = q_mouth_config.q_position.z + q_z_offset;
+        
+        // Set line length and orientation
+        q_mouth_entity.q_transmuteShapeParams({
+          q_length: 0.08 + Math.random() * 0.04 // Line segment length
+        });
+        
+        // Color with variation
+        const q_color_variation = Math.random();
+        let q_color;
+        if (q_color_variation < 0.3) {
+          q_color = this.q_config.q_colors.mouth.q_primary;
+        } else if (q_color_variation < 0.6) {
+          q_color = this.q_config.q_colors.mouth.q_emissive;
+        } else {
+          q_color = 0x00ffff; // Cyan highlight
+        }
+        
+        q_mouth_entity.q_transmuteRenderColor(q_color);
+        q_mouth_entity.q_render_size = 1.0;
+        q_mouth_entity.q_render_emissive = 0.7 + Math.random() * 0.3;
+        q_mouth_entity.q_transmuteEntropySignature(0.3 + Math.random() * 0.2);
+        q_mouth_entity.q_transmuteRenderOrder(10);
+        
+        q_stream_instance.q_transmuteEntity(q_mouth_entity);
+      }
     }
     
-    // Apply mouth flux modifier - particles pulse with speech
+    // Apply mouth flux modifier - waveform animation with entropy-driven pulses
     q_stream_instance.q_transmuteFluxModifier((f_entity, f_index) => {
       const q_time = this.q_time;
-      const q_pulse = Math.sin(q_time * 3 + f_index * 0.3) * 0.1;
-      f_entity.q_transmuteEntropy(0.2 + q_pulse);
+      
+      // Only animate LINE entities (mouth waveform)
+      if (f_entity.dna_type === 'LINE' && f_entity.q_wave_t !== undefined) {
+        // Get entropy from runtime streams for wave variation
+        let q_stream_entropy = 0.5;
+        if (this.q_engine && this.q_engine.runtime) {
+          const q_stats = this.q_engine.runtime.q_extractStats();
+          if (q_stats && q_stats.entity_count > 0) {
+            // Use entity count variation as entropy source
+            q_stream_entropy = (q_stats.entity_count % 100) / 100;
+          }
+        }
+        
+        // Create wave pulse from multiple sine waves
+        const q_wave1 = Math.sin(q_time * f_entity.q_wave_frequency + f_entity.q_wave_phase);
+        const q_wave2 = Math.sin(q_time * 1.5 + f_entity.q_wave_t * Math.PI * 4) * 0.5;
+        const q_wave3 = Math.sin(q_time * 0.7 + f_entity.q_wave_index * 0.2) * 0.3;
+        
+        // Combine waves with entropy influence
+        const q_combined_wave = (q_wave1 + q_wave2 + q_wave3) * f_entity.q_wave_amplitude;
+        const q_entropy_wave = q_combined_wave * (0.5 + q_stream_entropy * 0.5);
+        
+        // Apply wave to Y position
+        f_entity.flux_matrix[13] = f_entity.q_base_y + q_entropy_wave;
+        
+        // Add slight Z pulsation for 3D effect
+        const q_z_pulse = Math.sin(q_time * 2 + f_entity.q_wave_line * 0.5) * 0.02;
+        f_entity.flux_matrix[14] += q_z_pulse;
+        
+        // Pulse emissive based on wave intensity
+        const q_wave_intensity = Math.abs(q_combined_wave);
+        f_entity.q_render_emissive = 0.5 + q_wave_intensity * 0.5;
+        
+        // Update entropy signature
+        f_entity.q_transmuteEntropy(0.3 + q_wave_intensity * 0.4);
+      }
+      
       return f_entity;
     });
     
-    console.log(`Mouth stream created with ${q_mouth_particle_count} particles`);
+    console.log(`Mouth waveform created: ${q_waveform_lines} lines with ${q_points_per_line} points each`);
     return q_stream_instance;
   }
 

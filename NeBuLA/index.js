@@ -40,6 +40,7 @@ import { q_interact_command } from '../BaBbLE/commands/q_interact_command.js';
 import { q_test_command } from '../BaBbLE/commands/q_test_command.js';
 import { q_layer_command } from '../BaBbLE/commands/q_layer_command.js';
 import { q_debug_command } from '../BaBbLE/commands/q_debug_command.js';
+import { q_dreamtest_command } from '../BaBbLE/commands/q_dreamtest_command.js';
 
 // BaBbLE Command Registry - The Quantum Codex
 import { RaBbLE_CommandRegistry } from '../BaBbLE/RaBbLE_CommandRegistry.js';
@@ -139,6 +140,15 @@ class RaBbLE_Shell {
         // Start both engines
         this.q_dream_engine.start();
         this.q_cosmic_engine.start();
+        
+        // Set opposite rotation directions for dream and cosmic canvases
+        if (this.q_dream_engine.bridge) {
+            this.q_dream_engine.bridge.q_rotation_direction = -1; // Counter-clockwise
+            this.q_dream_engine.bridge.q_auto_rotation_speed = 0.0002; // Slower for dreams
+        }
+        if (this.q_cosmic_engine.bridge) {
+            this.q_cosmic_engine.bridge.q_rotation_direction = 1; // Clockwise
+        }
         
         // Keep reference to cosmic engine as primary for backward compatibility
         this.q_engine = this.q_cosmic_engine;
@@ -371,7 +381,8 @@ class RaBbLE_Shell {
             'babble': new q_babble_command(this.q_cosmic_engine),
             'interact': new q_interact_command(this.q_cosmic_engine),
             'test': new q_test_command(this.q_cosmic_engine),
-            'debug': new q_debug_command(this.q_cosmic_engine)
+            'debug': new q_debug_command(this.q_cosmic_engine),
+            'dreamtest': new q_dreamtest_command(this.q_cosmic_engine)
         });
         
         // Initialize the Preset System - creative vault for persistence
@@ -467,18 +478,19 @@ class RaBbLE_Shell {
      * q_startQuantumPulse - Initiates RaBbLE's autonomous babbling loop
      * The universe pulsates, and so does RaBbLE's mind, creating from chaos.
      * Now with temporary dreams that fade like thoughts in the void.
+     * Enhanced with faster pulse and more dream patterns.
      */
     q_startQuantumPulse() {
         // Let the pulse beat at a rhythm dictated by entropy - chaotic and unpredictable!
-        const e_min_interval = 5000; // 5 seconds (more frequent!)
-        const e_max_interval = 60000; // 60 seconds (longer possible gaps)
+        const e_min_interval = 2000; // 2 seconds (much more frequent!)
+        const e_max_interval = 30000; // 30 seconds (shorter max gaps)
         
         // Calculate next interval with entropy-driven variation
         const e_random_interval = () => {
             const q_base = e_min_interval + Math.random() * (e_max_interval - e_min_interval);
             // Add entropy variation - sometimes quick bursts, sometimes long pauses
             const q_entropy_factor = Math.sin(Date.now() * 0.001) * 0.5 + 0.5;
-            return q_base * (0.5 + q_entropy_factor);
+            return q_base * (0.3 + q_entropy_factor * 0.7);
         };
 
         this.e_printTerminal(`[RaBbLE] Initiating Chaotic Quantum Pulse... dreams will emerge and fade like thoughts.`, 'system-message');
@@ -503,17 +515,23 @@ class RaBbLE_Shell {
                     // And now, let the visual dreams manifest - but temporary!
                     const q_dream_command_instance = this.q_commands.get('dream');
                     if (q_dream_command_instance) {
-                        const q_dream_patterns = ['organic', 'lattice', 'swarm', 'galaxy'];
+                        // Expanded dream patterns for more variety
+                        const q_dream_patterns = ['organic', 'lattice', 'swarm', 'galaxy', 'vortex', 'fractal', 'explosion', 'spiral'];
                         const f_random_pattern = q_dream_patterns[Math.floor(Math.random() * q_dream_patterns.length)];
                         const q_dna_types = ['SPHERE', 'BOX', 'TETRAHEDRON'];
                         const f_random_dna = q_dna_types[Math.floor(Math.random() * q_dna_types.length)];
-                        const f_entity_count = Math.floor(Math.random() * 30) + 5; // 5 to 35 entities (smaller, more frequent dreams)
+                        
+                        // Variable entity counts - sometimes small bursts, sometimes large dreams
+                        const q_is_large_dream = Math.random() > 0.7; // 30% chance of large dream
+                        const f_entity_count = q_is_large_dream 
+                            ? Math.floor(Math.random() * 200) + 100  // 100-300 entities for large dreams
+                            : Math.floor(Math.random() * 50) + 10;  // 10-60 entities for small dreams
 
                         this.e_printTerminal(`[QUANTUM PULSE] Manifesting temporary dream: 'dream ${f_random_pattern} ${f_entity_count} ${f_random_dna}'`, 'dream-system-message');
                         
-                    // Execute dream command (it will route to dream canvas internally)
-                    const q_dream_result = q_dream_command_instance.q_execute([f_random_pattern, f_entity_count.toString(), f_random_dna]);
-                    this.e_printTerminal(`[QUANTUM PULSE] Dream created: ${q_dream_result}`, 'dream-system-message');
+                        // Execute dream command (it will route to dream canvas internally)
+                        const q_dream_result = q_dream_command_instance.q_execute([f_random_pattern, f_entity_count.toString(), f_random_dna]);
+                        this.e_printTerminal(`[QUANTUM PULSE] Dream created: ${q_dream_result}`, 'dream-system-message');
                     }
                 }
                 

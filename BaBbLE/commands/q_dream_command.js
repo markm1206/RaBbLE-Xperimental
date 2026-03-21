@@ -7,6 +7,8 @@
  */
 
 import { q_command } from '../RaBbLE_BaBbLE_Pipeline.js';
+import { q_stream } from '../../NeBuLA/core/q_stream.js';
+import { q_entity } from '../../NeBuLA/core/q_entity.js';
 
 class q_dream_command extends q_command {
   constructor(f_engine) {
@@ -18,8 +20,8 @@ class q_dream_command extends q_command {
     
     // The dreamer awakens... patterns emerge from the quantum foam.
     this.q_engine = f_engine;
-    this.q_patterns = ['organic', 'lattice', 'swarm', 'galaxy'];
-    this.q_types = ['SPHERE', 'BOX', 'TETRAHEDRON'];
+    this.q_patterns = ['organic', 'lattice', 'swarm', 'galaxy', 'vortex', 'fractal', 'explosion', 'spiral', 'waveform'];
+    this.q_types = ['SPHERE', 'BOX', 'TETRAHEDRON', 'LINE'];
   }
 
   q_source(f_args) {
@@ -39,9 +41,9 @@ class q_dream_command extends q_command {
       };
     }
     
-    // Validate count
-    if (f_params.count < 1 || f_params.count > 1000) {
-      return { error: 'Count must be between 1 and 1000' };
+    // Validate count - allow up to 500 entities for complex dreams
+    if (f_params.count < 1 || f_params.count > 500) {
+      return { error: 'Count must be between 1 and 500' };
     }
     
     // Validate type
@@ -74,18 +76,37 @@ class q_dream_command extends q_command {
       case 'galaxy':
         q_stream = this.q_engine.createGalaxyStream(f_params.count, f_params.type);
         break;
+      case 'vortex':
+        q_stream = this.q_engine.createVortexStream(f_params.count, f_params.type);
+        break;
+      case 'fractal':
+        q_stream = this.q_engine.createFractalStream(f_params.count, f_params.type);
+        break;
+      case 'explosion':
+        q_stream = this.q_engine.createExplosionStream(f_params.count, f_params.type);
+        break;
+      case 'spiral':
+        q_stream = this.q_engine.createSpiralStream(f_params.count, f_params.type);
+        break;
+      case 'waveform':
+        q_stream = this.q_engine.createWaveformStream(f_params.count, f_params.type);
+        break;
       default:
         q_stream = this.q_engine.createOrganicStream(f_params.count, f_params.type);
     }
     
     // Route to dream canvas for temporary display
     let q_dream_id = null;
-    if (this.q_engine && this.q_engine.canvas_manager && q_stream) {
+    if (q_stream && this.q_engine && this.q_engine.canvas_manager) {
       q_dream_id = this.q_engine.canvas_manager.q_routeStream(q_stream, 'dream', {
-        lifetime: 10 + Math.random() * 20, // 10-30 seconds lifetime
+        lifetime: 15 + Math.random() * 25, // 15-40 seconds lifetime (longer for complex dreams)
         opacity: 0.7 + Math.random() * 0.3
       });
       console.log(`Dream ${q_dream_id} routed to dream canvas`);
+    } else if (q_stream && this.q_engine && this.q_engine.runtime) {
+      // Fallback: register with runtime if canvas_manager not available
+      this.q_engine.runtime.q_transmuteStream(q_stream);
+      console.log(`Dream stream registered: ${q_stream.q_stream_id}`);
     }
     
     return {

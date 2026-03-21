@@ -64,6 +64,12 @@ class q_instanced_bridge {
       u_entropy: { value: 0.5 }
     };
     
+    // Auto-rotation and zoom settings
+    this.q_auto_rotation_speed = 0.0003; // Slow rotation speed
+    this.q_auto_zoom_speed = 0.001; // Gradual zoom speed
+    this.q_zoom_target = 15; // Target zoom distance
+    this.q_rotation_direction = 1; // 1 for cosmic, -1 for dream
+    
     this._initThreeJS();
     this._initShaderMaterials();
     console.log('Three.js instanced bridge initialized with multi-shader system');
@@ -92,6 +98,20 @@ class q_instanced_bridge {
     this.q_camera = new THREE.PerspectiveCamera(75, q_width / q_height, 0.1, 1000);
     this.q_camera.position.z = 20;
     
+    // Camera orbit state - the quantum eye explores the void
+    this.q_camera_state = {
+      theta: 0, // Horizontal orbit angle
+      phi: Math.PI / 2, // Vertical orbit angle (starts at equator)
+      radius: 20, // Distance from origin
+      target: new THREE.Vector3(0, 0, 0), // Look-at target
+      is_dragging: false,
+      last_mouse_x: 0,
+      last_mouse_y: 0,
+      pan_speed: 0.1,
+      orbit_speed: 0.005,
+      zoom_speed: 0.5
+    };
+    
     // Create renderer
     this.q_renderer = new THREE.WebGLRenderer({
       antialias: this.options.antialias,
@@ -102,6 +122,9 @@ class q_instanced_bridge {
     
     // Add to container
     this.container.appendChild(this.q_renderer.domElement);
+    
+    // Initialize camera controls
+    this._initCameraControls();
     
     // Handle resize
     const q_resize_handler = () => {
@@ -122,6 +145,135 @@ class q_instanced_bridge {
     
     this.is_initialized = true;
     console.log('Three.js initialized with dimensions:', q_width, 'x', q_height);
+  }
+
+  /**
+   * Initialize camera orbit controls
+   * The quantum eye explores the void through mouse and keyboard
+   * @private
+   */
+  _initCameraControls() {
+    // The camera controls emerge... mouse and keyboard guide the quantum eye.
+    const q_canvas = this.q_renderer.domElement;
+    
+    // Mouse drag for orbit rotation
+    q_canvas.addEventListener('mousedown', (e) => {
+      this.q_camera_state.is_dragging = true;
+      this.q_camera_state.last_mouse_x = e.clientX;
+      this.q_camera_state.last_mouse_y = e.clientY;
+      q_canvas.style.cursor = 'grabbing';
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (!this.q_camera_state.is_dragging) return;
+      
+      const q_delta_x = e.clientX - this.q_camera_state.last_mouse_x;
+      const q_delta_y = e.clientY - this.q_camera_state.last_mouse_y;
+      
+      // Orbit: horizontal drag rotates theta, vertical drag rotates phi
+      this.q_camera_state.theta -= q_delta_x * this.q_camera_state.orbit_speed;
+      this.q_camera_state.phi -= q_delta_y * this.q_camera_state.orbit_speed;
+      
+      // Clamp phi to prevent flipping
+      this.q_camera_state.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.q_camera_state.phi));
+      
+      this.q_camera_state.last_mouse_x = e.clientX;
+      this.q_camera_state.last_mouse_y = e.clientY;
+      
+      this._updateCameraPosition();
+    });
+    
+    document.addEventListener('mouseup', () => {
+      this.q_camera_state.is_dragging = false;
+      q_canvas.style.cursor = 'grab';
+    });
+    
+    // Scroll wheel for zoom
+    q_canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const q_zoom_delta = e.deltaY > 0 ? 1.1 : 0.9;
+      this.q_camera_state.radius *= q_zoom_delta;
+      
+      // Clamp radius to reasonable bounds
+      this.q_camera_state.radius = Math.max(5, Math.min(100, this.q_camera_state.radius));
+      
+      this._updateCameraPosition();
+    });
+    
+    // Keyboard controls for pan and zoom
+    const q_keys_pressed = new Set();
+    
+    document.addEventListener('keydown', (e) => {
+      // Only respond if this canvas's container is visible
+      if (this.container.offsetParent === null) return;
+      
+      q_keys_pressed.add(e.key.toLowerCase());
+      
+      // WASD for pan, QE for up/down, +/- for zoom
+      const q_pan_step = this.q_camera_state.pan_speed * this.q_camera_state.radius;
+      
+      if (e.key === 'w' || e.key === 'W') {
+        this.q_camera_state.target.y += q_pan_step;
+      } else if (e.key === 's' || e.key === 'S') {
+        this.q_camera_state.target.y -= q_pan_step;
+      } else if (e.key === 'a' || e.key === 'A') {
+        this.q_camera_state.target.x -= q_pan_step;
+      } else if (e.key === 'd' || e.key === 'D') {
+        this.q_camera_state.target.x += q_pan_step;
+      } else if (e.key === 'q' || e.key === 'Q') {
+        this.q_camera_state.target.z -= q_pan_step;
+      } else if (e.key === 'e' || e.key === 'E') {
+        this.q_camera_state.target.z += q_pan_step;
+      } else if (e.key === '+' || e.key === '=') {
+        this.q_camera_state.radius *= 0.9;
+        this.q_camera_state.radius = Math.max(5, this.q_camera_state.radius);
+      } else if (e.key === '-' || e.key === '_') {
+        this.q_camera_state.radius *= 1.1;
+        this.q_camera_state.radius = Math.min(100, this.q_camera_state.radius);
+      } else if (e.key === 'r' || e.key === 'R') {
+        // Reset camera to default position
+        this.q_camera_state.theta = 0;
+        this.q_camera_state.phi = Math.PI / 2;
+        this.q_camera_state.radius = 20;
+        this.q_camera_state.target.set(0, 0, 0);
+      }
+      
+      this._updateCameraPosition();
+    });
+    
+    document.addEventListener('keyup', (e) => {
+      q_keys_pressed.delete(e.key.toLowerCase());
+    });
+    
+    // Set initial cursor style
+    q_canvas.style.cursor = 'grab';
+    
+    // Initial camera position update
+    this._updateCameraPosition();
+    
+    console.log('Camera controls initialized: Drag to orbit, Scroll to zoom, WASD to pan, QE for depth, R to reset');
+  }
+
+  /**
+   * Update camera position based on orbit state
+   * The quantum eye moves through the void
+   * @private
+   */
+  _updateCameraPosition() {
+    // Convert spherical coordinates to Cartesian position
+    const q_x = this.q_camera_state.radius * Math.sin(this.q_camera_state.phi) * Math.cos(this.q_camera_state.theta);
+    const q_y = this.q_camera_state.radius * Math.cos(this.q_camera_state.phi);
+    const q_z = this.q_camera_state.radius * Math.sin(this.q_camera_state.phi) * Math.sin(this.q_camera_state.theta);
+    
+    // Set camera position relative to target
+    this.q_camera.position.set(
+      this.q_camera_state.target.x + q_x,
+      this.q_camera_state.target.y + q_y,
+      this.q_camera_state.target.z + q_z
+    );
+    
+    // Look at target
+    this.q_camera.lookAt(this.q_camera_state.target);
   }
 
   /**
@@ -481,6 +633,19 @@ class q_instanced_bridge {
         const stats = this.q_runtime.q_extractStats();
         const avg_entropy = this._calculateAverageEntropy();
         this.e_shader_uniforms.u_entropy.value = avg_entropy;
+      }
+      
+      // Auto-rotation: slowly rotate camera around the scene
+      if (!this.q_camera_state.is_dragging) {
+        this.q_camera_state.theta += this.q_auto_rotation_speed * this.q_rotation_direction;
+        
+        // Auto-zoom: gradually move toward target zoom distance
+        const q_zoom_diff = this.q_zoom_target - this.q_camera_state.radius;
+        if (Math.abs(q_zoom_diff) > 0.1) {
+          this.q_camera_state.radius += q_zoom_diff * this.q_auto_zoom_speed;
+        }
+        
+        this._updateCameraPosition();
       }
       
       // Render scene
