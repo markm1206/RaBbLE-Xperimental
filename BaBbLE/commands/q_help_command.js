@@ -24,22 +24,29 @@ class q_help_command extends q_command {
 
   q_source(f_args) {
     // The help awakens... knowledge flows from the collective.
-    // Check if user wants help on a specific command
     if (f_args.length > 0) {
-      const q_specific_command = f_args[0].toLowerCase();
+      const q_first_arg = f_args[0].toLowerCase();
+      
+      // Check for special modes
+      if (q_first_arg === 'tips' || q_first_arg === 'guide') {
+        return { commands: this.q_commands, mode: 'tips' };
+      }
+      if (q_first_arg === 'quickstart' || q_first_arg === 'start') {
+        return { commands: this.q_commands, mode: 'quickstart' };
+      }
+      
+      // Otherwise it's a specific command
       return {
         commands: this.q_commands,
-        specific: q_specific_command
+        specific: q_first_arg
       };
     }
-    return { commands: this.q_commands };
+    return { commands: this.q_commands, mode: 'default' };
   }
 
   q_filter(f_data) {
     // The filter selects... only valid commands remain.
-    // But we also preserve our special request for specific command help
     if (f_data.specific) {
-      // Find the specific command
       const q_found = this.q_commands.find(cmd =>
         cmd.q_name.toLowerCase() === f_data.specific ||
         cmd.q_aliases.some(alias => alias.toLowerCase() === f_data.specific)
@@ -50,14 +57,14 @@ class q_help_command extends q_command {
       };
     }
     return {
-      commands: f_data.commands.filter(cmd => cmd instanceof q_command)
+      commands: f_data.commands.filter(cmd => cmd instanceof q_command),
+      mode: f_data.mode || 'default'
     };
   }
 
   q_transmute(f_data) {
-    // The transmute formats... commands become readable with RaBbLE's babbling touch
+    // The transmute formats... commands become readable
     if (f_data.specific_command) {
-      // Provide detailed help for specific command
       const q_cmd = f_data.specific_command;
       return {
         specific_help: true,
@@ -66,36 +73,36 @@ class q_help_command extends q_command {
       };
     }
     
-    // Categorize commands for better organization
-    const q_categories = this.q_categorizeCommands(f_data.commands);
-    const q_category_lines = [];
-    
-    for (const [q_cat_name, q_cmds] of Object.entries(q_categories)) {
-      q_category_lines.push(`\n--- ${q_cat_name} ---`);
-      q_cmds.forEach(cmd => {
-        q_category_lines.push(`  ${cmd.q_help()}`);
-      });
+    // Check for special help modes
+    if (f_data.mode === 'tips') {
+      return { specific_help: false, mode: 'tips', tips: this.q_generateUsageTips() };
+    }
+    if (f_data.mode === 'quickstart') {
+      return { specific_help: false, mode: 'quickstart', quickstart: this.q_generateQuickstart() };
     }
     
+    // Compact categorized list
+    const q_categories = this.q_categorizeCommands(f_data.commands);
     return {
       specific_help: false,
-      lines: q_category_lines,
-      babble_wisdom: this.q_generateBabbleWisdom(),
-      usage_tips: this.q_generateUsageTips()
+      mode: 'default',
+      categories: q_categories
     };
   }
 
   q_sink(f_result) {
-    // The sink reveals... the path through the quantum void with RaBbLE's voice
     if (f_result.specific_help) {
       return this.q_formatSpecificHelp(f_result);
     }
+    if (f_result.mode === 'tips') {
+      return f_result.tips;
+    }
+    if (f_result.mode === 'quickstart') {
+      return f_result.quickstart;
+    }
     
-    // The help emerges... thoughts flow from the quantum void.
-    let q_output = `[HELP] The Map of Chaos (Categorized):\n${f_result.lines.join('\n')}\n`;
-    q_output += `\n${f_result.babble_wisdom}\n`;
-    q_output += `\n${f_result.usage_tips}\n`;
-    return q_output;
+    // Compact formatted help
+    return this.q_formatCompactHelp(f_result.categories);
   }
 
   /**
@@ -258,55 +265,118 @@ class q_help_command extends q_command {
    */
   q_formatSpecificHelp(f_result) {
     const q_cmd = f_result.command;
-    const q_aliases = f_cmd.q_aliases.length > 0
-      ? ` (aliases: ${f_cmd.q_aliases.join(', ')})`
+    const q_aliases = q_cmd.q_aliases.length > 0
+      ? ` [${q_cmd.q_aliases.join(', ')}]`
       : '';
     
-    let q_output = `[HELP] ${f_cmd.q_name}${q_aliases}\n`;
-    q_output += `Description: ${f_cmd.q_description}\n\n`;
+    let q_output = `╔══════════════════════════════════════════════════════════╗\n`;
+    q_output += `║  ${q_cmd.q_name.toUpperCase()}${q_aliases}\n`;
+    q_output += `╚══════════════════════════════════════════════════════════╝\n\n`;
+    q_output += `${q_cmd.q_description}\n\n`;
     q_output += f_result.detailed_help;
     
     return q_output;
   }
 
   /**
+   * Format compact help output with aligned columns
+   * @private
+   * @param {Object} f_categories - Categorized commands
+   * @returns {string} Formatted compact help
+   */
+  q_formatCompactHelp(f_categories) {
+    const q_lines = [];
+    q_lines.push('╔══════════════════════════════════════════════════════════╗');
+    q_lines.push('║              RABBLE COMMAND REFERENCE                    ║');
+    q_lines.push('╚══════════════════════════════════════════════════════════╝');
+    q_lines.push('');
+    
+    for (const [q_cat_name, q_cmds] of Object.entries(f_categories)) {
+      q_lines.push(`┌─ ${q_cat_name.toUpperCase()} ${'─'.repeat(Math.max(0, 50 - q_cat_name.length))}┐`);
+      
+      // Find max name length for alignment
+      const q_max_name = Math.max(...q_cmds.map(c => c.q_name.length));
+      
+      q_cmds.forEach(cmd => {
+        const q_padded_name = cmd.q_name.padEnd(q_max_name + 2);
+        const q_aliases = cmd.q_aliases.length > 0 ? ` [${cmd.q_aliases.join(',')}]` : '';
+        q_lines.push(`│ ${q_padded_name}${cmd.q_description}${q_aliases}`);
+      });
+      
+      q_lines.push(`└${'─'.repeat(58)}┘`);
+      q_lines.push('');
+    }
+    
+    q_lines.push('Use: help [command]  │  help tips  │  help quickstart');
+    q_lines.push('');
+    q_lines.push(`💭 ${this.q_generateBabbleWisdom()}`);
+    
+    return q_lines.join('\n');
+  }
+
+  /**
+   * Generate quickstart guide
+   * @private
+   * @returns {string} Quickstart text
+   */
+  q_generateQuickstart() {
+    return [
+      '╔══════════════════════════════════════════════════════════╗',
+      '║                 QUICK START GUIDE                        ║',
+      '╚══════════════════════════════════════════════════════════╝',
+      '',
+      '1️⃣  Create your first pattern:',
+      '    dream organic 20 SPHERE',
+      '',
+      '2️⃣  Add some chaos:',
+      '    chaos 0.7',
+      '',
+      '3️⃣  Create attraction forces:',
+      '    attract 0.3 0.6 5.0',
+      '',
+      '4️⃣  Hear RaBbLE think:',
+      '    babble creation 0.8 3',
+      '',
+      '5️⃣  Save your creation:',
+      '    preset save myFirstDream',
+      '',
+      '┌────────────────────────────────────────────────────────┐',
+      '│ More patterns: dream lattice, dream swarm, dream       │',
+      '│ galaxy, dream vortex, dream spiral, dream waveform     │',
+      '│                                                        │',
+      '│ Pipelines: stream "dream 10 >> pulse 0.5 >> sink"      │',
+      '│ Combining: weave "dream 5 SPHERE" <> "dream 5 BOX"     │',
+      '└────────────────────────────────────────────────────────┘'
+    ].join('\n');
+  }
+
+  /**
    * q_categorizeCommands - Organizes commands into thematic categories.
-   * Order emerges from the chaos of raw command lists.
    * @private
    * @param {Array<q_command>} f_commands - The list of all registered commands.
    * @returns {Object} An object where keys are categories and values are arrays of commands.
    */
   q_categorizeCommands(f_commands) {
-    // The categorizer perceives patterns in the command ether...
     const q_categorized_commands = {
-      'Stream Generation & Manipulation': [],
-      'Visual Effects & Dynamics': [],
-      'State & Persistence': [],
-      'Autonomous Systems': [],
-      'Meta-Commands': []
+      'Create': [],
+      'Dynamics': [],
+      'Save & Load': [],
+      'System': []
     };
 
-    // Each command finds its resonance in the great categorizing flux.
     for (const q_cmd of f_commands) {
       const q_name = q_cmd.q_name.toLowerCase();
       if (['dream', 'stream', 'weave', 'seed', 'patterns'].includes(q_name)) {
-        q_categorized_commands['Stream Generation & Manipulation'].push(q_cmd);
+        q_categorized_commands['Create'].push(q_cmd);
       } else if (['attract', 'trail', 'mix', 'chaos', 'collapse'].includes(q_name)) {
-        q_categorized_commands['Visual Effects & Dynamics'].push(q_cmd);
+        q_categorized_commands['Dynamics'].push(q_cmd);
       } else if (['lake', 'from', 'preset', 'composite'].includes(q_name)) {
-        q_categorized_commands['State & Persistence'].push(q_cmd);
-      } else if (['babble'].includes(q_name)) {
-        q_categorized_commands['Autonomous Systems'].push(q_cmd);
-      } else if (['help', 'status'].includes(q_name)) {
-        q_categorized_commands['Meta-Commands'].push(q_cmd);
-      } else {
-        // Core or unknown category
-        if (!q_categorized_commands['Core Commands']) q_categorized_commands['Core Commands'] = [];
-        q_categorized_commands['Core Commands'].push(q_cmd);
+        q_categorized_commands['Save & Load'].push(q_cmd);
+      } else if (['babble', 'help', 'status'].includes(q_name)) {
+        q_categorized_commands['System'].push(q_cmd);
       }
     }
 
-    // Filter out empty categories
     const q_filtered = {};
     Object.entries(q_categorized_commands).forEach(([name, list]) => {
       if (list.length > 0) q_filtered[name] = list;

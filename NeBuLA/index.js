@@ -218,7 +218,7 @@ class RaBbLE_Shell {
             let q_resize_start_x = 0;
             let q_resize_start_y = 0;
             
-            // Window dragging
+            // Window dragging - mouse
             q_header.addEventListener('mousedown', (e) => {
                 if (e.target.closest('.window-controls')) return;
                 
@@ -229,6 +229,19 @@ class RaBbLE_Shell {
                 q_window.classList.add('dragging');
                 this.q_bringWindowToFront(q_window);
             });
+            
+            // Window dragging - touch (identical to mouse)
+            q_header.addEventListener('touchstart', (e) => {
+                if (e.target.closest('.window-controls')) return;
+                
+                const touch = e.touches[0];
+                q_is_dragging = true;
+                q_offset_x = touch.clientX - q_window.offsetLeft;
+                q_offset_y = touch.clientY - q_window.offsetTop;
+                
+                q_window.classList.add('dragging');
+                this.q_bringWindowToFront(q_window);
+            }, { passive: true });
             
             // Window resizing - detect resize handle
             q_window.addEventListener('mousedown', (e) => {
@@ -263,7 +276,33 @@ class RaBbLE_Shell {
                 }
             });
             
+            // Touch move - identical to mouse move
+            document.addEventListener('touchmove', (e) => {
+                if (q_is_dragging) {
+                    const touch = e.touches[0];
+                    q_window.style.left = (touch.clientX - q_offset_x) + 'px';
+                    q_window.style.top = (touch.clientY - q_offset_y) + 'px';
+                    q_window.style.right = 'auto';
+                }
+                
+                if (q_is_resizing) {
+                    const touch = e.touches[0];
+                    const q_new_width = q_resize_start_width + (touch.clientX - q_resize_start_x);
+                    const q_new_height = q_resize_start_height + (touch.clientY - q_resize_start_y);
+                    
+                    if (q_new_width > 200) q_window.style.width = q_new_width + 'px';
+                    if (q_new_height > 100) q_window.style.height = q_new_height + 'px';
+                }
+            }, { passive: true });
+            
             document.addEventListener('mouseup', () => {
+                q_is_dragging = false;
+                q_is_resizing = false;
+                q_window.classList.remove('dragging');
+            });
+            
+            // Touch end - identical to mouse up
+            document.addEventListener('touchend', () => {
                 q_is_dragging = false;
                 q_is_resizing = false;
                 q_window.classList.remove('dragging');

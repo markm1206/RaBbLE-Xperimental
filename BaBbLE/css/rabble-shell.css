@@ -351,29 +351,259 @@ body {
   background: linear-gradient(135deg, transparent 50%, var(--q-glass-border) 50%);
 }
 
-/* Responsive Adjustments */
+/* ==========================================
+   RESPONSIVE DESIGN - Mobile First
+   ========================================== */
+
+/* Tablet - 768px to 1024px */
 @media (max-width: 1024px) {
   #dream-window,
   #cosmic-window {
-    width: 48%;
-    height: 50%;
+    width: 47%;
+    height: 45%;
+  }
+  
+  #terminal-window {
+    height: 180px;
+  }
+  
+  #window-menu {
+    padding: 5px 8px;
+    gap: 5px;
+  }
+  
+  #window-menu button {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  
+  #performance-overlay {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: 100px;
   }
 }
 
+/* Mobile Large - 480px to 768px */
 @media (max-width: 768px) {
+  /* Stack windows vertically */
   #dream-window,
   #cosmic-window {
-    width: 90%;
-    height: 40%;
-    left: 5%;
-    right: 5%;
+    width: calc(100% - 20px);
+    left: 10px;
+    right: 10px;
+    height: 35%;
   }
   
   #dream-window {
-    top: 60px;
+    top: 55px;
   }
   
   #cosmic-window {
-    top: 50%;
+    top: calc(35% + 65px);
+  }
+  
+  #terminal-window {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: calc(100% - 35% - 35% - 85px);
+    min-height: 120px;
+  }
+  
+  /* Window menu - horizontal scroll */
+  #window-menu {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    padding: 4px 6px;
+    gap: 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  
+  #window-menu button {
+    padding: 6px 10px;
+    font-size: 10px;
+    min-height: 32px;
+    flex-shrink: 0;
+  }
+  
+  /* Performance overlay - compact */
+  #performance-overlay {
+    top: 5px;
+    right: 5px;
+    padding: 4px 6px;
+    font-size: 9px;
+    min-width: 80px;
+  }
+  
+  #performance-overlay div {
+    margin: 1px 0;
+  }
+  
+  /* Window adjustments */
+  .window-header {
+    padding: 6px 10px;
+  }
+  
+  .window-title {
+    font-size: 11px;
+  }
+  
+  .window-controls button {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+  }
+  
+  /* Terminal sizing */
+  #terminal-output {
+    font-size: 11px;
+    padding: 8px;
+  }
+  
+  #terminal-input-line {
+    padding: 6px 8px;
+  }
+  
+  #terminal-input {
+    font-size: 11px;
+  }
+}
+
+/* Mobile Small - under 480px */
+@media (max-width: 480px) {
+  /* Full-width stacked layout */
+  #dream-window,
+  #cosmic-window {
+    width: calc(100% - 10px);
+    left: 5px;
+    right: 5px;
+    height: 30%;
+  }
+  
+  #dream-window {
+    top: 50px;
+  }
+  
+  #cosmic-window {
+    top: calc(30% + 60px);
+  }
+  
+  #terminal-window {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    height: calc(100% - 30% - 30% - 70px);
+    min-height: 100px;
+  }
+  
+  /* Menu - very compact */
+  #window-menu {
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    padding: 3px 4px;
+    gap: 3px;
+  }
+  
+  #window-menu button {
+    padding: 5px 8px;
+    font-size: 9px;
+    min-height: 28px;
+  }
+  
+  /* Performance - minimal */
+  #performance-overlay {
+    font-size: 8px;
+    padding: 3px 5px;
+    min-width: 60px;
+  }
+  
+  /* Touch-friendly window controls */
+  .window-controls button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+  
+  /* Smaller fonts */
+  .window-title {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  
+  #terminal-output {
+    font-size: 10px;
+    padding: 6px;
+  }
+  
+  #terminal-input {
+    font-size: 10px;
+  }
+  
+  .boot-line {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  #window-menu button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 12px;
+  }
+  
+  .window-controls button {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+  
+  #terminal-input {
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+  
+  /* Disable hover effects on touch devices */
+  #window-menu button:hover {
+    background: transparent;
+  }
+  
+  .window-controls button:hover {
+    background: transparent;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  #dream-window,
+  #cosmic-window {
+    width: 48%;
+    height: 60%;
+  }
+  
+  #dream-window {
+    left: 5px;
+    top: 45px;
+  }
+  
+  #cosmic-window {
+    right: 5px;
+    top: 45px;
+  }
+  
+  #terminal-window {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    height: calc(100% - 60% - 60px);
+    min-height: 80px;
   }
 }
