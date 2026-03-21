@@ -82,6 +82,163 @@ Coding standards and naming conventions for all RaBbLE projects.
    - Type `status` to see system metrics
    - Type `chaos` to increase entropy
 
+## User Interface & Interactions
+
+### Window System
+
+RaBbLE features a multi-window interface with three main windows:
+
+| Window | Position | Purpose |
+|--------|----------|---------|
+| **DREAM** | Left side | Temporary chaos, experimental particles |
+| **COSMIC** | Right side | Permanent content, RaBbLE's vessel |
+| **TERMINAL** | Bottom | Command input and system output |
+
+#### Window Controls
+
+Each window has a header bar with:
+
+- **Title**: Window name (DREAM, COSMIC, TERMINAL)
+- **Minimize button (−)**: Collapses window to header only
+- **Close button (×)**: Hides window completely
+
+#### Window Interactions
+
+| Action | How To |
+|--------|--------|
+| **Drag window** | Click and drag the window header |
+| **Resize window** | Click and drag the bottom-right corner |
+| **Bring to front** | Click anywhere on the window |
+| **Minimize** | Click the − button in the header |
+| **Close** | Click the × button in the header |
+| **Restore window** | Click the window name in the menu bar |
+
+#### Window Menu Bar
+
+Located at the top-left of the screen, the window menu shows toggle buttons for each window:
+
+```
+[DREAM] [COSMIC] [TERMINAL]
+```
+
+- **Active (highlighted)**: Window is visible
+- **Inactive**: Window is hidden
+- **Click**: Toggles window visibility
+
+### Terminal System
+
+The terminal is the primary interface for controlling RaBbLE.
+
+#### Terminal Input
+
+- **Prompt**: `λ` (lambda symbol)
+- **Input field**: Type commands here
+- **Placeholder**: Shows "Communicate with the shell... (↑/↓ for history)"
+
+#### Command History
+
+Navigate through previously entered commands:
+
+| Key | Action |
+|-----|--------|
+| **↑ (Arrow Up)** | Previous command in history |
+| **↓ (Arrow Down)** | Next command in history |
+| **Enter** | Execute current command |
+
+History stores up to 100 commands during the session.
+
+#### Global Keyboard Capture
+
+The terminal automatically captures keyboard input:
+
+- **Start typing anywhere** → Terminal input receives focus
+- **No need to click** on terminal first
+- **Exception**: When focused on another input field
+
+This allows quick command entry while interacting with canvas windows.
+
+### Available Commands
+
+#### Dream Commands (affect DREAM canvas)
+
+| Command | Syntax | Description |
+|---------|--------|-------------|
+| `dream` | `dream [pattern] [count] [type]` | Create quantum stream |
+| `chaos` | `chaos [intensity]` | Expand entropy bounds (0.0-1.0) |
+| `collapse` | `collapse [intensity]` | Stabilize system with lower entropy |
+| `seed` | `seed [value] dream [args]` | Create reproducible patterns |
+| `trail` | `trail [length] [fade]` | Add motion trails to entities |
+
+**Patterns**: organic, lattice, swarm, galaxy
+**Types**: SPHERE, BOX, TETRAHEDRON
+
+#### Cosmic Commands (affect COSMIC canvas)
+
+| Command | Syntax | Description |
+|---------|--------|-------------|
+| `stream` | `stream "dream >> filter >> sink"` | Create pipeline streams |
+| `weave` | `weave [stream1] [stream2]` | Combine multiple streams |
+| `attract` | `attract [strength] [threshold] [radius]` | Entropy-based flocking |
+| `mix` | `mix [weight]` | Blend streams together |
+| `lake` | `lake [name]` | Capture stream state |
+| `from` | `from [name]` | Restore stream from lake |
+| `garden` | `garden [action]` | Cultivate entropy garden |
+| `layer` | `layer [action]` | Manage stream layers |
+
+#### System Commands
+
+| Command | Syntax | Description |
+|---------|--------|-------------|
+| `help` | `help` | Display available commands |
+| `status` | `status` | Show system metrics |
+| `patterns` | `patterns` | List available dream patterns |
+| `babble` | `babble [theme] [intensity] [length]` | Generate RaBbLE's thoughts |
+| `clear` | `clear` | Clear terminal output |
+| `ls` | `ls` | List available commands |
+| `whoami` | `whoami` | Display identity information |
+
+### Performance Overlay
+
+Located at the top-right, displays real-time metrics:
+
+```
+FPS: 60
+Entities: 150
+Streams: 3
+```
+
+- **FPS**: Frames per second (rendering performance)
+- **Entities**: Total quantum entities across all engines
+- **Streams**: Number of active data streams
+
+### Keyboard Shortcuts
+
+| Shortcut | Context | Action |
+|----------|---------|--------|
+| **Any letter key** | Anywhere | Auto-focus terminal |
+| **↑** | Terminal | Previous command |
+| **↓** | Terminal | Next command |
+| **Enter** | Terminal | Execute command |
+| **Click header** | Window | Bring window to front |
+| **Click menu button** | Menu bar | Toggle window visibility |
+
+### Visual Feedback
+
+#### Window States
+
+- **Normal**: Fully visible with content
+- **Minimized**: Header only, content hidden
+- **Hidden**: Completely invisible (use menu to restore)
+- **Focused**: Highlighted border, brought to front
+- **Dragging**: Semi-transparent while moving
+
+#### Terminal Output
+
+- **System messages**: Cyan colored
+- **User commands**: Magenta colored (`> command`)
+- **Errors**: Red colored
+- **RaBbLE babbling**: Mixed colors with poetic formatting
+
 ## Project Structure
 
 ```

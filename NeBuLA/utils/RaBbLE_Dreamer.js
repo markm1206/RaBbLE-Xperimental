@@ -26,28 +26,62 @@ class RaBbLE_Dreamer {
     this.current_dream_pattern = this._defaultDreamPattern;
     
     this.generation_presets = {
-      // Organic growth pattern
+      // Organic growth pattern - with colors and variation
       organic: (count, center = {x: 0, y: 0, z: 0}) => {
         const entities = [];
+        const q_colors = [
+          0x8B5CF6, // Purple
+          0x3B82F6, // Blue
+          0x06B6D4, // Cyan
+          0x10B981, // Green
+          0xF59E0B, // Amber
+          0xEF4444, // Red
+          0xEC4899, // Pink
+          0xF97316  // Orange
+        ];
+        
         for (let i = 0; i < count; i++) {
           const angle = i * 0.618; // Golden angle for organic spacing
           const radius = Math.sqrt(i) * 2;
           
-          const entity = new q_entity('SPHERE');
+          // Randomly select DNA type for variety
+          const q_dna_types = ['SPHERE', 'BOX', 'TETRAHEDRON'];
+          const q_random_type = q_dna_types[Math.floor(Math.random() * q_dna_types.length)];
+          
+          const entity = new q_entity(q_random_type);
           entity.flux_matrix[12] = center.x + Math.cos(angle) * radius;
           entity.flux_matrix[13] = center.y + Math.sin(angle) * radius * 0.5;
           entity.flux_matrix[14] = center.z + (i * 0.1);
-          entity.e_entropy_sig = Math.random() * 0.3 + 0.4; // Moderate entropy
+          entity.e_entropy_sig = Math.random() * 0.5 + 0.3; // Higher entropy variation
+          
+          // Add color variation
+          entity.q_render_color = q_colors[Math.floor(Math.random() * q_colors.length)];
+          
+          // Add size variation
+          entity.q_render_size = 0.5 + Math.random() * 1.5; // Size between 0.5 and 2.0
+          
+          // Add emissive variation
+          entity.q_render_emissive = 0.3 + Math.random() * 0.7; // Emissive between 0.3 and 1.0
+          
+          // Add opacity variation
+          entity.q_render_opacity = 0.6 + Math.random() * 0.4; // Opacity between 0.6 and 1.0
           
           entities.push(entity);
         }
         return entities;
       },
       
-      // Geometric lattice pattern
+      // Geometric lattice pattern - with colors and variation
       lattice: (count, spacing = 2.0) => {
         const entities = [];
         const size = Math.ceil(Math.cbrt(count));
+        const q_colors = [
+          0x8B5CF6, // Purple
+          0x3B82F6, // Blue
+          0x06B6D4, // Cyan
+          0x10B981, // Green
+          0xF59E0B  // Amber
+        ];
         
         for (let x = 0; x < size; x++) {
           for (let y = 0; y < size; y++) {
@@ -58,7 +92,16 @@ class RaBbLE_Dreamer {
               entity.flux_matrix[12] = (x - size/2) * spacing;
               entity.flux_matrix[13] = (y - size/2) * spacing;
               entity.flux_matrix[14] = (z - size/2) * spacing;
-              entity.e_entropy_sig = 0.1; // Low entropy for structure
+              entity.e_entropy_sig = 0.1 + Math.random() * 0.2; // Low entropy but with variation
+              
+              // Add color variation
+              entity.q_render_color = q_colors[Math.floor(Math.random() * q_colors.length)];
+              
+              // Add size variation
+              entity.q_render_size = 0.8 + Math.random() * 0.4; // Size between 0.8 and 1.2
+              
+              // Add emissive variation
+              entity.q_render_emissive = 0.2 + Math.random() * 0.5; // Emissive between 0.2 and 0.7
               
               entities.push(entity);
             }
@@ -67,11 +110,25 @@ class RaBbLE_Dreamer {
         return entities;
       },
       
-      // Chaotic swarm pattern
+      // Chaotic swarm pattern - with colors and variation
       swarm: (count, radius = 10.0) => {
         const entities = [];
+        const q_colors = [
+          0xEF4444, // Red
+          0xF97316, // Orange
+          0xF59E0B, // Amber
+          0x84CC16, // Lime
+          0x06B6D4, // Cyan
+          0x8B5CF6, // Purple
+          0xEC4899  // Pink
+        ];
+        
         for (let i = 0; i < count; i++) {
-          const entity = new q_entity('TETRAHEDRON');
+          // Randomly select DNA type for variety
+          const q_dna_types = ['TETRAHEDRON', 'SPHERE', 'BOX'];
+          const q_random_type = q_dna_types[Math.floor(Math.random() * q_dna_types.length)];
+          
+          const entity = new q_entity(q_random_type);
           
           // Random position within sphere
           const theta = Math.random() * Math.PI * 2;
@@ -83,14 +140,34 @@ class RaBbLE_Dreamer {
           entity.flux_matrix[14] = r * Math.cos(phi);
           entity.e_entropy_sig = Math.random() * 0.8 + 0.2; // High entropy
           
+          // Add color variation
+          entity.q_render_color = q_colors[Math.floor(Math.random() * q_colors.length)];
+          
+          // Add size variation
+          entity.q_render_size = 0.3 + Math.random() * 1.7; // Size between 0.3 and 2.0
+          
+          // Add emissive variation
+          entity.q_render_emissive = 0.4 + Math.random() * 0.6; // Emissive between 0.4 and 1.0
+          
+          // Add opacity variation
+          entity.q_render_opacity = 0.5 + Math.random() * 0.5; // Opacity between 0.5 and 1.0
+          
           entities.push(entity);
         }
         return entities;
       },
       
-      // Spiral galaxy pattern
+      // Spiral galaxy pattern - with colors and variation
       galaxy: (count, arms = 3, tightness = 0.5) => {
         const entities = [];
+        const q_colors = [
+          0x8B5CF6, // Purple
+          0x3B82F6, // Blue
+          0x06B6D4, // Cyan
+          0xF5FDFF, // White
+          0xFBBF24  // Yellow
+        ];
+        
         for (let i = 0; i < count; i++) {
           const angle = i * 0.1;
           const arm_offset = (i % arms) * (Math.PI * 2 / arms);
@@ -100,7 +177,17 @@ class RaBbLE_Dreamer {
           entity.flux_matrix[12] = Math.cos(angle + arm_offset) * radius;
           entity.flux_matrix[13] = Math.sin(angle + arm_offset) * radius * 0.1; // Flattened
           entity.flux_matrix[14] = Math.sin(i * 0.05) * 2; // Vertical oscillation
-          entity.e_entropy_sig = Math.random() * 0.2 + 0.1; // Low entropy
+          entity.e_entropy_sig = Math.random() * 0.3 + 0.1; // Low entropy with variation
+          
+          // Add color variation based on position
+          const q_color_index = Math.floor((i / count) * q_colors.length);
+          entity.q_render_color = q_colors[q_color_index % q_colors.length];
+          
+          // Add size variation based on position
+          entity.q_render_size = 0.2 + (i / count) * 0.8; // Size increases with position
+          
+          // Add emissive variation
+          entity.q_render_emissive = 0.5 + Math.random() * 0.5; // Emissive between 0.5 and 1.0
           
           entities.push(entity);
         }

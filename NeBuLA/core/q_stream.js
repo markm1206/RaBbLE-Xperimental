@@ -29,12 +29,56 @@ class q_stream {
     this.flux_modifier = flux_modifier || this._defaultFluxModifier;
     this.q_length = 0;
     
+    // TTL and Fading - To prevent the void from overflowing
+    this.q_ttl = Infinity; 
+    this.q_creation_time = Date.now();
+    this.q_fade_duration = 5000; // 5 seconds default fade
+    this.q_is_dissolving = false;
+
     // Add initial entities if provided
     if (initial_entities.length > 0) {
       this.q_transmuteEntities(initial_entities);
     }
     
     console.log(`Quantum stream ${this.q_stream_id} initialized with ${this.q_length} entities`);
+  }
+
+  /**
+   * q_setTTL - Set the time-to-live for this stream
+   * @param {number} f_ms - Life in milliseconds
+   */
+  q_setTTL(f_ms) {
+    this.q_ttl = f_ms;
+  }
+
+  /**
+   * q_checkEntropyDecay - Checks if the stream should begin dissolving
+   * Entropy consumes all in time.
+   */
+  q_checkEntropyDecay() {
+    if (this.q_ttl === Infinity) return false;
+    
+    const q_age = Date.now() - this.q_creation_time;
+    if (q_age > this.q_ttl) {
+        this.q_is_dissolving = true;
+    }
+    return this.q_is_dissolving;
+  }
+
+  /**
+   * q_getFadeOpacity - Calculates the current opacity based on age and TTL
+   */
+  q_getFadeOpacity() {
+    if (this.q_ttl === Infinity) return 1.0;
+    
+    const q_age = Date.now() - this.q_creation_time;
+    const q_time_left = this.q_ttl - q_age;
+    
+    if (q_time_left > 0) return 1.0;
+    
+    // Fade out phase
+    const q_fade_progress = Math.abs(q_time_left) / this.q_fade_duration;
+    return Math.max(0, 1.0 - q_fade_progress);
   }
 
 

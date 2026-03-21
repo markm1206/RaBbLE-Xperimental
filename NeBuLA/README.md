@@ -4,6 +4,30 @@
 
 NeBuLA (Nebula Behavioral Learning Architecture) is the quantum rendering engine for RaBbLE. It transforms abstract data streams into visual manifestations using the Flat-Chaos pattern and Three.js integration.
 
+## Recent Enhancements (v2.0)
+
+### Dual Canvas Window System
+NeBuLA now features a sophisticated window management system with two primary canvases:
+
+- **Dream Canvas**: The creative visualization space for quantum stream generation
+- **Cosmic Canvas**: The system monitoring and diagnostic canvas
+
+Each canvas runs in its own resizable, draggable window with minimize/close controls.
+
+### Terminal Window
+A full-featured terminal window provides:
+- **Command History**: Navigate with Arrow Up/Down keys
+- **Global Keyboard Capture**: Press any key to focus terminal input
+- **Real-time Command Execution**: Full access to all BaBbLE commands
+- **Window Management**: Drag, resize, minimize, and close
+
+### Window Management Features
+- **Draggable Windows**: Click and drag title bars to reposition
+- **Resizable Windows**: Drag bottom-right corner to resize
+- **Minimize/Close Controls**: Standard window controls on title bars
+- **Window Menu**: Restore closed windows from the menu bar
+- **Performance Overlay**: Real-time FPS and entity statistics
+
 ## Architecture
 
 NeBuLA follows the **Flat-Chaos** pattern - a revolutionary approach that replaces hierarchical scene graphs with linear data streams:
@@ -144,12 +168,74 @@ All NeBuLA code follows the RaBbLE Behavioral Coding & Naming Specification:
 - Comments follow "stream-of-consciousness" style
 - Flat-Chaos patterns with shallow nesting
 
+## Dependency Injection & Testing
+
+NeBuLA implements a robust dependency injection system for testability:
+
+### RaBbLE_ServiceRegistry
+The quantum dependency injector manages service registration and resolution:
+
+```javascript
+const registry = new RaBbLE_ServiceRegistry();
+registry.q_register('engine', () => createEngine(), true);
+const engine = registry.q_resolve('engine');
+```
+
+### RaBbLE_MockFactory
+Factory for creating mock services for isolated testing:
+
+```javascript
+const mockEngine = RaBbLE_MockFactory.q_createMockEngine();
+const mockRuntime = RaBbLE_MockFactory.q_createMockRuntime();
+```
+
+### Test Suite
+The `RaBbLE_Nebula_TestSuite` uses dependency injection for isolated testing:
+
+```javascript
+const testRegistry = RaBbLE_Nebula_TestSuite.q_createTestRegistry();
+const suite = new RaBbLE_Nebula_TestSuite(testRegistry);
+await suite.runAllTests();
+```
+
+## Window System Architecture
+
+The shell initialization in `NeBuLA/index.js` creates the dual canvas system:
+
+1. **Dream Engine**: Primary visualization engine with full runtime
+2. **Cosmic Engine**: Secondary engine for system monitoring
+3. **Terminal Window**: Command execution and history management
+4. **Window Manager**: Handles dragging, resizing, and window lifecycle
+
+Each window is a separate DOM container with its own Three.js canvas, enabling independent rendering and user interaction.
+
 ## Performance Considerations
 
 - Uses Three.js InstancedMesh for efficient rendering
 - Shader caching to avoid recompilation
 - Dynamic draw usage for animated entities
 - Entropy-based LOD (Level of Detail) possible
+
+## User Interface
+
+### Window Controls
+- **Drag**: Click and hold title bar to move window
+- **Resize**: Drag bottom-right corner to resize
+- **Minimize**: Click minimize button to hide window
+- **Close**: Click close button to remove window
+- **Restore**: Use Window menu to restore closed windows
+
+### Terminal Features
+- **Command Input**: Type commands in the terminal input field
+- **Command History**: Press Arrow Up/Down to navigate command history
+- **Global Focus**: Press any key to focus the terminal input
+- **Command Execution**: Press Enter to execute commands
+
+### Performance Monitoring
+- **FPS Counter**: Real-time frames per second display
+- **Entity Count**: Current number of active entities
+- **Stream Count**: Number of registered streams
+- **Render Statistics**: Three.js render performance metrics
 
 ## Future Enhancements
 
@@ -158,3 +244,6 @@ All NeBuLA code follows the RaBbLE Behavioral Coding & Naming Specification:
 - Physics integration
 - Audio-reactive visuals
 - VR/AR support
+- Additional window layouts
+- Window snapping and docking
+- Multi-monitor support

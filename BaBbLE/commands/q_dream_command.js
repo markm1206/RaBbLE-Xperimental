@@ -78,12 +78,23 @@ class q_dream_command extends q_command {
         q_stream = this.q_engine.createOrganicStream(f_params.count, f_params.type);
     }
     
+    // Route to dream canvas for temporary display
+    let q_dream_id = null;
+    if (this.q_engine && this.q_engine.canvas_manager && q_stream) {
+      q_dream_id = this.q_engine.canvas_manager.q_routeStream(q_stream, 'dream', {
+        lifetime: 10 + Math.random() * 20, // 10-30 seconds lifetime
+        opacity: 0.7 + Math.random() * 0.3
+      });
+      console.log(`Dream ${q_dream_id} routed to dream canvas`);
+    }
+    
     return {
       success: true,
       pattern: f_params.pattern,
       count: f_params.count,
       type: f_params.type,
       stream_id: q_stream ? q_stream.q_stream_id : 'unknown',
+      dream_id: q_dream_id,
       message: `Dreamed ${f_params.count} ${f_params.type} entities with ${f_params.pattern} pattern`
     };
   }
@@ -94,11 +105,17 @@ class q_dream_command extends q_command {
     }
     
     // The dream emerges... particles dance in the void.
-    return `[DREAM] ${f_result.message}\n` +
+    let q_output = `[DREAM] ${f_result.message}\n` +
            `  Pattern: ${f_result.pattern}\n` +
            `  Count: ${f_result.count}\n` +
            `  Type: ${f_result.type}\n` +
            `  Stream: ${f_result.stream_id}`;
+    
+    if (f_result.dream_id) {
+      q_output += `\n  Dream ID: ${f_result.dream_id} (temporary, will fade)`;
+    }
+    
+    return q_output;
   }
 }
 

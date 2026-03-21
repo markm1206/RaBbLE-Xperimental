@@ -74,12 +74,22 @@ class q_instanced_bridge {
    * @private
    */
   _initThreeJS() {
+    // The quantum void awakens... but first check if the container exists.
+    if (!this.container) {
+      console.error('Container element is null or undefined');
+      return;
+    }
+    
+    // Get container dimensions with fallbacks for hidden/zero-size containers
+    const q_width = this.container.clientWidth || 400;
+    const q_height = this.container.clientHeight || 300;
+    
     // Create scene
     this.q_scene = new THREE.Scene();
     this.q_scene.background = this.options.background;
     
     // Create camera
-    this.q_camera = new THREE.PerspectiveCamera(75, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+    this.q_camera = new THREE.PerspectiveCamera(75, q_width / q_height, 0.1, 1000);
     this.q_camera.position.z = 20;
     
     // Create renderer
@@ -87,20 +97,31 @@ class q_instanced_bridge {
       antialias: this.options.antialias,
       alpha: this.options.alpha
     });
-    this.q_renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    this.q_renderer.setSize(q_width, q_height);
     this.q_renderer.setPixelRatio(window.devicePixelRatio);
     
     // Add to container
     this.container.appendChild(this.q_renderer.domElement);
     
     // Handle resize
-    window.addEventListener('resize', () => {
-      this.q_camera.aspect = this.container.clientWidth / this.container.clientHeight;
+    const q_resize_handler = () => {
+      const q_new_width = this.container.clientWidth || 400;
+      const q_new_height = this.container.clientHeight || 300;
+      this.q_camera.aspect = q_new_width / q_new_height;
       this.q_camera.updateProjectionMatrix();
-      this.q_renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-    });
+      this.q_renderer.setSize(q_new_width, q_new_height);
+    };
+    
+    window.addEventListener('resize', q_resize_handler);
+    
+    // Also observe container size changes (for when windows become visible)
+    if (typeof ResizeObserver !== 'undefined') {
+      this.q_resize_observer = new ResizeObserver(q_resize_handler);
+      this.q_resize_observer.observe(this.container);
+    }
     
     this.is_initialized = true;
+    console.log('Three.js initialized with dimensions:', q_width, 'x', q_height);
   }
 
   /**

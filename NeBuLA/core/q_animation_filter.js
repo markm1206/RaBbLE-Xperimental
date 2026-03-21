@@ -133,11 +133,18 @@ class RaBbLE_AnimationFilter {
    * @returns {q_entity} Animated entity
    */
   q_applyPulse(f_entity, f_index) {
-    const q_pulse_wave = Math.sin(this.e_animation_time * 2 + f_index * 0.1);
+    const q_speed = this.q_animation_params.speed || 2.0;
+    const q_pulse_wave = Math.sin(this.e_animation_time * q_speed + f_index * 0.1);
     const q_pulse_intensity = (q_pulse_wave + 1) * 0.5; // 0 to 1
     
     // Pulse affects entropy signature
     f_entity.e_entropy_sig = 0.3 + q_pulse_intensity * 0.4;
+
+    // BREATHING EFFECT: Scale the entity's matrix directly
+    const q_scale = 1.0 + q_pulse_intensity * 0.2;
+    f_entity.flux_matrix[0] *= q_scale;
+    f_entity.flux_matrix[5] *= q_scale;
+    f_entity.flux_matrix[10] *= q_scale;
     
     return f_entity;
   }

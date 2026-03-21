@@ -177,6 +177,7 @@ class q_stream_command extends q_command {
 
   /**
    * Execute dream stage - create initial stream
+   * The dream awakens... geometry flows from the void.
    * @private
    * @param {Array<string>} f_args - Stage arguments
    * @returns {Object} Stage result with stream
@@ -189,11 +190,47 @@ class q_stream_command extends q_command {
     
     const q_stream = this.q_engine.dream_geometry_flow(q_count, q_type, q_pattern);
     
-    return {
-      success: true,
+    return this.q_createSuccess({
       stream: q_stream,
       message: `Dreamed ${q_count} ${q_type} with ${q_pattern} pattern`
-    };
+    });
+  }
+
+  /**
+   * Apply animation filter to stream
+   * The filter applies... chaos transforms into order.
+   * @private
+   * @param {q_stream} f_stream - Stream to apply filter to
+   * @param {RaBbLE_AnimationFilter} f_filter - Filter to apply
+   * @param {string} f_filter_name - Name of filter for storage
+   * @param {string} f_message - Success message
+   * @returns {Object} Stage result
+   */
+  q_applyFilterToStream(f_stream, f_filter, f_filter_name, f_message) {
+    // The filter applies... transformation flows through the stream.
+    if (!f_stream) {
+      return this.q_createError(`No stream to apply ${f_filter_name} to`);
+    }
+    
+    // Store filter for reference
+    this.q_animation_filters.set(f_filter_name, f_filter);
+    
+    // Apply filter to stream's flux modifier
+    const q_original_modifier = f_stream.flux_modifier;
+    f_stream.q_transmuteFluxModifier((f_entity, f_index) => {
+      // Apply original modifier first
+      let q_entity = q_original_modifier ? q_original_modifier(f_entity, f_index) : f_entity;
+      
+      // Then apply filter
+      q_entity = f_filter.q_applyFilter(q_entity, f_index, 0.016);
+      
+      return q_entity;
+    });
+    
+    return this.q_createSuccess({
+      stream: f_stream,
+      message: f_message
+    });
   }
 
   /**
@@ -207,31 +244,15 @@ class q_stream_command extends q_command {
     // Blink stage: blink 4.0
     const q_cycle = parseFloat(f_args[0]) || 4.0;
     
-    if (!f_stream) {
-      return { error: 'No stream to apply blink to' };
-    }
-    
     // Create blink filter with RBCNS-compliant naming
     const q_blink_filter = new RaBbLE_AnimationFilter('blink', { cycle: q_cycle });
-    this.q_animation_filters.set('blink', q_blink_filter);
     
-    // Apply filter to stream's flux modifier
-    const q_original_modifier = f_stream.flux_modifier;
-    f_stream.q_transmuteFluxModifier((f_entity, f_index) => {
-      // Apply original modifier first
-      let q_entity = q_original_modifier ? q_original_modifier(f_entity, f_index) : f_entity;
-      
-      // Then apply blink filter
-      q_entity = q_blink_filter.q_applyFilter(q_entity, f_index, 0.016);
-      
-      return q_entity;
-    });
-    
-    return {
-      success: true,
-      stream: f_stream,
-      message: `Applied blink filter with ${q_cycle}s cycle`
-    };
+    return this.q_applyFilterToStream(
+      f_stream,
+      q_blink_filter,
+      'blink',
+      `Applied blink filter with ${q_cycle}s cycle`
+    );
   }
 
   /**
@@ -245,27 +266,15 @@ class q_stream_command extends q_command {
     // Dart stage: dart 3.5
     const q_cycle = parseFloat(f_args[0]) || 3.5;
     
-    if (!f_stream) {
-      return { error: 'No stream to apply dart to' };
-    }
-    
     // Create dart filter
     const q_dart_filter = new RaBbLE_AnimationFilter('dart', { cycle: q_cycle });
-    this.q_animation_filters.set('dart', q_dart_filter);
     
-    // Apply filter to stream
-    const q_original_modifier = f_stream.flux_modifier;
-    f_stream.q_transmuteFluxModifier((f_entity, f_index) => {
-      let q_entity = q_original_modifier ? q_original_modifier(f_entity, f_index) : f_entity;
-      q_entity = q_dart_filter.q_applyFilter(q_entity, f_index, 0.016);
-      return q_entity;
-    });
-    
-    return {
-      success: true,
-      stream: f_stream,
-      message: `Applied dart filter with ${q_cycle}s cycle`
-    };
+    return this.q_applyFilterToStream(
+      f_stream,
+      q_dart_filter,
+      'dart',
+      `Applied dart filter with ${q_cycle}s cycle`
+    );
   }
 
   /**
@@ -279,25 +288,15 @@ class q_stream_command extends q_command {
     // Pulse stage: pulse 0.5
     const q_intensity = parseFloat(f_args[0]) || 0.5;
     
-    if (!f_stream) {
-      return { error: 'No stream to apply pulse to' };
-    }
-    
+    // Create pulse filter
     const q_pulse_filter = new RaBbLE_AnimationFilter('pulse', { intensity: q_intensity });
-    this.q_animation_filters.set('pulse', q_pulse_filter);
     
-    const q_original_modifier = f_stream.flux_modifier;
-    f_stream.q_transmuteFluxModifier((f_entity, f_index) => {
-      let q_entity = q_original_modifier ? q_original_modifier(f_entity, f_index) : f_entity;
-      q_entity = q_pulse_filter.q_applyFilter(q_entity, f_index, 0.016);
-      return q_entity;
-    });
-    
-    return {
-      success: true,
-      stream: f_stream,
-      message: `Applied pulse filter with intensity ${q_intensity}`
-    };
+    return this.q_applyFilterToStream(
+      f_stream,
+      q_pulse_filter,
+      'pulse',
+      `Applied pulse filter with intensity ${q_intensity}`
+    );
   }
 
   /**
@@ -312,25 +311,15 @@ class q_stream_command extends q_command {
     const q_speed = parseFloat(f_args[0]) || 1.0;
     const q_radius = parseFloat(f_args[1]) || 0.1;
     
-    if (!f_stream) {
-      return { error: 'No stream to apply orbit to' };
-    }
-    
+    // Create orbit filter
     const q_orbit_filter = new RaBbLE_AnimationFilter('orbit', { speed: q_speed, radius: q_radius });
-    this.q_animation_filters.set('orbit', q_orbit_filter);
     
-    const q_original_modifier = f_stream.flux_modifier;
-    f_stream.q_transmuteFluxModifier((f_entity, f_index) => {
-      let q_entity = q_original_modifier ? q_original_modifier(f_entity, f_index) : f_entity;
-      q_entity = q_orbit_filter.q_applyFilter(q_entity, f_index, 0.016);
-      return q_entity;
-    });
-    
-    return {
-      success: true,
-      stream: f_stream,
-      message: `Applied orbit filter (speed: ${q_speed}, radius: ${q_radius})`
-    };
+    return this.q_applyFilterToStream(
+      f_stream,
+      q_orbit_filter,
+      'orbit',
+      `Applied orbit filter (speed: ${q_speed}, radius: ${q_radius})`
+    );
   }
 
   /**
@@ -345,29 +334,20 @@ class q_stream_command extends q_command {
     const q_frequency = parseFloat(f_args[0]) || 2.0;
     const q_amplitude = parseFloat(f_args[1]) || 0.1;
     
-    if (!f_stream) {
-      return { error: 'No stream to apply wave to' };
-    }
-    
+    // Create wave filter
     const q_wave_filter = new RaBbLE_AnimationFilter('wave', { frequency: q_frequency, amplitude: q_amplitude });
-    this.q_animation_filters.set('wave', q_wave_filter);
     
-    const q_original_modifier = f_stream.flux_modifier;
-    f_stream.q_transmuteFluxModifier((f_entity, f_index) => {
-      let q_entity = q_original_modifier ? q_original_modifier(f_entity, f_index) : f_entity;
-      q_entity = q_wave_filter.q_applyFilter(q_entity, f_index, 0.016);
-      return q_entity;
-    });
-    
-    return {
-      success: true,
-      stream: f_stream,
-      message: `Applied wave filter (frequency: ${q_frequency}, amplitude: ${q_amplitude})`
-    };
+    return this.q_applyFilterToStream(
+      f_stream,
+      q_wave_filter,
+      'wave',
+      `Applied wave filter (frequency: ${q_frequency}, amplitude: ${q_amplitude})`
+    );
   }
 
   /**
    * Execute sink stage - output to display
+   * The sink reveals... the result emerges from the void.
    * @private
    * @param {Array<string>} f_args - Stage arguments
    * @param {q_stream} f_stream - Current stream
@@ -376,14 +356,13 @@ class q_stream_command extends q_command {
   q_executeSink(f_args, f_stream) {
     // Sink stage: final output
     if (!f_stream) {
-      return { error: 'No stream to sink' };
+      return this.q_createError('No stream to sink');
     }
     
-    return {
-      success: true,
+    return this.q_createSuccess({
       stream: f_stream,
       message: `Stream ${f_stream.q_stream_id} ready for display`
-    };
+    });
   }
 }
 

@@ -7,6 +7,70 @@
  */
 
 /**
+ * RaBbLE_CommandValidator - Parameter Validation Utility
+ * The quantum guardian of valid data... chaos meets order at the gates.
+ */
+class RaBbLE_CommandValidator {
+  /**
+   * Validate value is within range
+   * @param {number} f_value - Value to validate
+   * @param {number} f_min - Minimum value
+   * @param {number} f_max - Maximum value
+   * @param {string} f_name - Parameter name for error message
+   * @returns {string|null} Error message or null if valid
+   */
+  static q_validateRange(f_value, f_min, f_max, f_name) {
+    if (isNaN(f_value)) {
+      return `${f_name} must be a number`;
+    }
+    if (f_value < f_min || f_value > f_max) {
+      return `${f_name} must be between ${f_min} and ${f_max}`;
+    }
+    return null;
+  }
+
+  /**
+   * Validate value is in enum
+   * @param {*} f_value - Value to validate
+   * @param {Array} f_enum - Valid values
+   * @param {string} f_name - Parameter name for error message
+   * @returns {string|null} Error message or null if valid
+   */
+  static q_validateEnum(f_value, f_enum, f_name) {
+    if (!f_enum.includes(f_value)) {
+      return `Invalid ${f_name}: ${f_value}. Use: ${f_enum.join(', ')}`;
+    }
+    return null;
+  }
+
+  /**
+   * Validate value is required
+   * @param {*} f_value - Value to validate
+   * @param {string} f_name - Parameter name for error message
+   * @returns {string|null} Error message or null if valid
+   */
+  static q_validateRequired(f_value, f_name) {
+    if (f_value === undefined || f_value === null || f_value === '') {
+      return `${f_name} is required`;
+    }
+    return null;
+  }
+
+  /**
+   * Validate value is positive number
+   * @param {number} f_value - Value to validate
+   * @param {string} f_name - Parameter name for error message
+   * @returns {string|null} Error message or null if valid
+   */
+  static q_validatePositive(f_value, f_name) {
+    if (isNaN(f_value) || f_value <= 0) {
+      return `${f_name} must be a positive number`;
+    }
+    return null;
+  }
+}
+
+/**
  * q_command - Base class for all BaBbLE pipeline commands
  * Each command implements the four stages of the pipeline
  */
@@ -20,6 +84,112 @@ class q_command {
     this.q_name = f_config.name || 'unknown';
     this.q_description = f_config.description || 'A quantum command';
     this.q_aliases = f_config.aliases || [];
+    this.q_params = f_config.params || [];
+  }
+
+  /**
+   * Parse arguments based on parameter schema
+   * The quantum parser... raw args become structured data.
+   * @param {Array} f_args - Command arguments
+   * @returns {Object} Parsed parameters
+   */
+  q_parseArgs(f_args) {
+    const q_parsed = {};
+    
+    this.q_params.forEach((q_param, q_index) => {
+      const q_raw = f_args[q_index];
+      
+      // Apply default if not provided
+      if (q_raw === undefined && q_param.default !== undefined) {
+        q_parsed[q_param.name] = q_param.default;
+        return;
+      }
+      
+      // Parse based on type
+      switch (q_param.type) {
+        case 'number':
+          q_parsed[q_param.name] = parseFloat(q_raw) || q_param.default || 0;
+          break;
+        case 'integer':
+          q_parsed[q_param.name] = parseInt(q_raw) || q_param.default || 0;
+          break;
+        case 'string':
+        default:
+          q_parsed[q_param.name] = q_raw || q_param.default || '';
+          break;
+      }
+    });
+    
+    return q_parsed;
+  }
+  
+  /**
+   * Format error message
+   * The error emerges... chaos reveals its nature.
+   * @param {string} f_message - Error message
+   * @returns {string} Formatted error
+   */
+  q_formatError(f_message) {
+    return `ERROR: ${f_message}`;
+  }
+  
+  /**
+   * Format success message with data
+   * The success manifests... order emerges from chaos.
+   * @param {string} f_message - Success message
+   * @param {Object} f_data - Data to format
+   * @returns {string} Formatted success
+   */
+  q_formatSuccess(f_message, f_data = {}) {
+    let q_output = `[${this.q_name.toUpperCase()}] ${f_message}`;
+    
+    // Format data as key-value pairs
+    Object.entries(f_data).forEach(([q_key, q_value]) => {
+      q_output += `\n  ${q_key}: ${q_value}`;
+    });
+    
+    return q_output;
+  }
+  
+  /**
+   * Format data as list
+   * The data flows... items emerge as a stream.
+   * @param {Array} f_items - Items to format
+   * @param {Function} f_formatter - Function to format each item
+   * @returns {string} Formatted list
+   */
+  q_formatList(f_items, f_formatter = (item) => `  ${item}`) {
+    return f_items.map(f_formatter).join('\n');
+  }
+  
+  /**
+   * Check if result is error
+   * The error detector... chaos signals its presence.
+   * @param {Object} f_result - Result to check
+   * @returns {boolean} True if error
+   */
+  q_isError(f_result) {
+    return f_result && f_result.error !== undefined;
+  }
+  
+  /**
+   * Create error result
+   * The error creator... chaos takes form.
+   * @param {string} f_message - Error message
+   * @returns {Object} Error result
+   */
+  q_createError(f_message) {
+    return { error: f_message };
+  }
+  
+  /**
+   * Create success result
+   * The success creator... order takes form.
+   * @param {Object} f_data - Success data
+   * @returns {Object} Success result
+   */
+  q_createSuccess(f_data = {}) {
+    return { success: true, ...f_data };
   }
 
   /**
@@ -267,93 +437,113 @@ class q_help_command extends q_command {
 
 /**
  * q_chaos_command - Expand entropy bounds
+ * Refactored to use base class utilities... the chaos flows more cleanly.
  */
 class q_chaos_command extends q_command {
   constructor() {
     super({
       name: 'chaos',
       description: 'Expand entropy bounds for more dynamic visuals',
-      aliases: ['c', 'expand']
+      aliases: ['c', 'expand'],
+      params: [
+        { name: 'intensity', type: 'number', default: 0.8 }
+      ]
     });
   }
 
   q_source(f_args) {
     // The chaos awakens... entropy bounds expand.
-    return { intensity: parseFloat(f_args[0]) || 0.8 };
+    return this.q_parseArgs(f_args);
   }
 
   q_filter(f_params) {
     // The filter validates... chaos within horizons.
-    if (f_params.intensity < 0 || f_params.intensity > 1) {
-      return { error: 'Intensity must be between 0 and 1' };
+    const q_error = RaBbLE_CommandValidator.q_validateRange(
+      f_params.intensity, 0, 1, 'Intensity'
+    );
+    
+    if (q_error) {
+      return this.q_createError(q_error);
     }
+    
     return f_params;
   }
 
   q_transmute(f_params) {
-    if (f_params.error) return f_params;
+    if (this.q_isError(f_params)) return f_params;
     
     // The chaos ignites... entropy expands.
-    return {
-      success: true,
+    return this.q_createSuccess({
       intensity: f_params.intensity,
       message: `Entropy bounds expanded to ${f_params.intensity}`
-    };
+    });
   }
 
   q_sink(f_result) {
-    if (f_result.error) {
-      return `ERROR: ${f_result.error}`;
+    if (this.q_isError(f_result)) {
+      return this.q_formatError(f_result.error);
     }
     
     // The chaos emerges... the furnace burns brighter.
-    return `[CHAOS] ${f_result.message}`;
+    return this.q_formatSuccess(f_result.message, {
+      Intensity: f_result.intensity
+    });
   }
 }
 
 /**
  * q_collapse_command - Stabilize the system
+ * Refactored to use base class utilities... stability flows more cleanly.
  */
 class q_collapse_command extends q_command {
   constructor() {
     super({
       name: 'collapse',
       description: 'Stabilize the system with lower entropy',
-      aliases: ['cl', 'stabilize']
+      aliases: ['cl', 'stabilize'],
+      params: [
+        { name: 'intensity', type: 'number', default: 0.2 }
+      ]
     });
   }
 
   q_source(f_args) {
     // The collapse awakens... stability flows in.
-    return { intensity: parseFloat(f_args[0]) || 0.2 };
+    return this.q_parseArgs(f_args);
   }
 
   q_filter(f_params) {
     // The filter validates... collapse within bounds.
-    if (f_params.intensity < 0 || f_params.intensity > 1) {
-      return { error: 'Intensity must be between 0 and 1' };
+    const q_error = RaBbLE_CommandValidator.q_validateRange(
+      f_params.intensity, 0, 1, 'Intensity'
+    );
+    
+    if (q_error) {
+      return this.q_createError(q_error);
     }
+    
     return f_params;
   }
 
   q_transmute(f_params) {
-    if (f_params.error) return f_params;
+    if (this.q_isError(f_params)) return f_params;
     
     // The collapse stabilizes... entropy contracts.
-    return {
-      success: true,
+    return this.q_createSuccess({
       intensity: f_params.intensity,
       message: `System stabilizing... entropy set to ${f_params.intensity}`
-    };
+    });
   }
 
   q_sink(f_result) {
-    if (f_result.error) {
-      return `ERROR: ${f_result.error}`;
+    if (this.q_isError(f_result)) {
+      return this.q_formatError(f_result.error);
     }
     
     // The collapse emerges... calm from chaos.
-    return `[COLLAPSE] ${f_result.message}`;
+    return this.q_formatSuccess(f_result.message, {
+      Intensity: f_result.intensity
+    });
   }
 }
 
@@ -399,6 +589,7 @@ class q_patterns_command extends q_command {
 
 // Export for use in other modules
 export { 
+  RaBbLE_CommandValidator,
   q_command,
   q_dream_command,
   q_status_command,

@@ -6,7 +6,7 @@
 
 ## 🏗️ Architecture Summary
 
-### **Core Components (9 Phases Completed)**
+### **Core Components (12 Phases Completed)**
 
 1. **Core Data Structures** - `q_entity` and `q_stream` with entropy signatures
 2. **Flat-Chaos Runtime** - Central `RaBbLE_Nebula_Runtime` managing all streams
@@ -17,6 +17,9 @@
 7. **Shader System** - Centralized `e_entropy_shader_system` with caching
 8. **Simplified API** - High-level `RaBbLE_Nebula_Engine` for easy usage
 9. **Test Pages** - Modular examples and comprehensive documentation
+10. **Dual Canvas Window System** - Dream and Cosmic canvases with window management
+11. **Terminal Window** - Command execution with history and global keyboard capture
+12. **Dependency Injection** - `RaBbLE_ServiceRegistry` for testability and modularity
 
 ## 🎨 Visual Capabilities
 
@@ -32,6 +35,12 @@
 - **TETRAHEDRON**: Sharp, triangular entities
 
 Each DNA type responds uniquely to entropy, creating distinct visual signatures.
+
+### **Window System**
+- **Dream Canvas**: Primary creative visualization space
+- **Cosmic Canvas**: System monitoring and diagnostics
+- **Terminal Window**: Command execution with history
+- **Window Management**: Drag, resize, minimize, close, restore
 
 ## 🔧 Technical Features
 
@@ -51,6 +60,8 @@ Each DNA type responds uniquely to entropy, creating distinct visual signatures.
 - **Modular Architecture**: Clean separation of concerns
 - **Comprehensive Documentation**: Usage guides and API references
 - **Multiple Examples**: From basic to advanced usage
+- **Dependency Injection**: `RaBbLE_ServiceRegistry` for testability
+- **Mock Factory**: `RaBbLE_MockFactory` for isolated testing
 
 ## 📁 File Structure
 
@@ -72,7 +83,7 @@ NeBuLA/
 │   ├── simple_example.html       # Basic 5-entity scene
 │   └── advanced_example.html     # Complex multi-pattern scene
 ├── test/                          # Testing framework
-│   └── RaBbLE_Nebula_TestSuite.js # Comprehensive test suite
+│   └── RaBbLE_Nebula_TestSuite.js # Comprehensive test suite with DI
 ├── docs/                          # Documentation
 │   ├── RABL_Specification.md     # Core specification
 │   ├── RBCNS_Specification.md    # Naming conventions
@@ -80,7 +91,13 @@ NeBuLA/
 ├── test_page.html                # Original comprehensive test page
 ├── test_page_modular.html        # Modern modular test page
 ├── USAGE_GUIDE.md                # Developer documentation
-└── README.md                     # Project overview
+└── README.md                     # Project overview with UI docs
+```
+
+### **Dependency Injection System**
+```
+BaBbLE/
+└── RaBbLE_ServiceRegistry.js     # DI container and mock factory
 ```
 
 ## 🚀 Usage Examples
@@ -165,7 +182,7 @@ engine.start();
 
 ## 🎉 Project Status: COMPLETE
 
-The RaBbLE project is now a fully functional, production-ready quantum visualization system. All 9 phases have been completed successfully, with:
+The RaBbLE project is now a fully functional, production-ready quantum visualization system. All 12 phases have been completed successfully, with:
 
 - ✅ Complete core architecture
 - ✅ High-performance rendering
@@ -173,6 +190,12 @@ The RaBbLE project is now a fully functional, production-ready quantum visualiza
 - ✅ Comprehensive documentation
 - ✅ Multiple working examples
 - ✅ Fixed import path issues
+- ✅ Dual canvas window system (Dream/Cosmic)
+- ✅ Terminal window with command history
+- ✅ Window management (drag, resize, minimize, close, restore)
+- ✅ Global keyboard capture for terminal focus
+- ✅ Dependency injection for testability
+- ✅ Modernized test suite with mock services
 - ✅ Ready for immediate use
 
 ## 🚀 Next Steps
@@ -183,5 +206,7 @@ The system is ready for:
 3. **Extension** with additional pattern types
 4. **Optimization** for specific use cases
 5. **Educational use** for teaching quantum visualization concepts
+6. **Window layout improvements** (snapping, docking, multi-monitor)
+7. **Additional terminal features** (auto-complete, command aliases)
 
 **Happy quantum visualizing!** 🌌✨

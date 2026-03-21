@@ -65,32 +65,13 @@ body {
   z-index: 1;
 }
 
-/* Terminal App */
-#terminal-app {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 400px;
-  height: 300px;
-  background: var(--q-glass);
-  border: 1px solid var(--q-glass-border);
-  border-radius: var(--q-border-radius);
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity var(--q-transition), transform var(--q-transition);
-}
-
 /* Ignited State */
 .ignited #boot-sequence {
   opacity: 0;
   visibility: hidden;
 }
 
-.ignited #terminal-app {
+.ignited .rabble-window {
   opacity: 1;
   transform: translateY(0);
 }
@@ -143,6 +124,45 @@ body {
   background: var(--q-glass-border);
 }
 
+/* Window Menu Bar */
+#window-menu {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+  background: var(--q-glass);
+  border: 1px solid var(--q-glass-border);
+  border-radius: var(--q-border-radius);
+  padding: 6px 10px;
+  backdrop-filter: blur(5px);
+}
+
+#window-menu button {
+  background: transparent;
+  border: 1px solid var(--q-glass-border);
+  color: var(--q-cyan);
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--q-font);
+  font-size: 11px;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+#window-menu button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: var(--q-cyan);
+}
+
+#window-menu button.active {
+  background: rgba(0, 255, 255, 0.3);
+  border-color: var(--q-cyan);
+  text-shadow: 0 0 5px var(--q-cyan);
+}
+
 /* Performance Overlay */
 #performance-overlay {
   position: absolute;
@@ -166,4 +186,194 @@ body {
 #performance-overlay span {
   color: var(--q-magenta);
   font-weight: bold;
+}
+
+/* ==========================================
+   QUANTUM WINDOW SYSTEM
+   Separate canvas windows for Dream and Cosmic
+   ========================================== */
+
+/* Window Container */
+.rabble-window {
+  position: absolute;
+  background: var(--q-glass);
+  border: 1px solid var(--q-glass-border);
+  border-radius: var(--q-border-radius);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: box-shadow 0.3s ease;
+}
+
+.rabble-window:focus-within {
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+/* Dream Window - Left Side */
+#dream-window {
+  left: 20px;
+  top: 60px;
+  width: 45%;
+  height: 60%;
+  z-index: 50;
+}
+
+/* Cosmic Window - Right Side */
+#cosmic-window {
+  right: 20px;
+  top: 60px;
+  width: 45%;
+  height: 60%;
+  z-index: 50;
+}
+
+/* Terminal Window - Full Width Bottom */
+#terminal-window {
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  height: 200px;
+  z-index: 50;
+}
+
+.terminal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-content #terminal-output {
+  flex: 1;
+}
+
+/* Window Header - Draggable */
+.window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, rgba(138, 43, 226, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%);
+  border-bottom: 1px solid var(--q-glass-border);
+  cursor: move;
+  user-select: none;
+}
+
+.window-title {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--q-cyan);
+  text-shadow: 0 0 5px var(--q-cyan);
+}
+
+/* Window Controls */
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.window-controls button {
+  background: transparent;
+  border: 1px solid var(--q-glass-border);
+  color: var(--q-cyan);
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.window-controls button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: var(--q-cyan);
+}
+
+.window-close:hover {
+  background: rgba(255, 0, 100, 0.3) !important;
+  border-color: #ff0064 !important;
+  color: #ff0064 !important;
+}
+
+/* Window Content - Canvas Container */
+.window-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.window-content canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Minimized State */
+.rabble-window.minimized {
+  height: auto !important;
+}
+
+.rabble-window.minimized .window-content {
+  display: none;
+}
+
+/* Window Focus States */
+.rabble-window.focused {
+  z-index: 100;
+  border-color: var(--q-cyan);
+}
+
+/* Window Hidden State */
+.rabble-window.hidden {
+  display: none;
+}
+
+/* Dragging State */
+.rabble-window.dragging {
+  opacity: 0.9;
+  cursor: grabbing;
+}
+
+/* Window Resize Handle */
+.rabble-window::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, var(--q-glass-border) 50%);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  #dream-window,
+  #cosmic-window {
+    width: 48%;
+    height: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  #dream-window,
+  #cosmic-window {
+    width: 90%;
+    height: 40%;
+    left: 5%;
+    right: 5%;
+  }
+  
+  #dream-window {
+    top: 60px;
+  }
+  
+  #cosmic-window {
+    top: 50%;
+  }
 }

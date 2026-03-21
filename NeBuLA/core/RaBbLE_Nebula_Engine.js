@@ -9,6 +9,7 @@ import { RaBbLE_Dreamer } from '../utils/RaBbLE_Dreamer.js';
 import { q_instanced_bridge } from '../threejs/q_instanced_bridge.js';
 import { q_stream } from './q_stream.js';
 import { q_entity } from './q_entity.js';
+import { RaBbLE_CanvasManager } from '../components/CanvasManager/RaBbLE_CanvasManager.js';
 
 // Verify Three.js is available before importing Three.js components
 if (typeof THREE === 'undefined') {
