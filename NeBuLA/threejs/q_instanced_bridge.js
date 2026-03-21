@@ -65,9 +65,9 @@ class q_instanced_bridge {
     };
     
     // Auto-rotation and zoom settings
-    this.q_auto_rotation_speed = 0.0003; // Slow rotation speed
+    this.q_auto_rotation_speed = 0.00005; // Very slow rotation speed
     this.q_auto_zoom_speed = 0.001; // Gradual zoom speed
-    this.q_zoom_target = 15; // Target zoom distance
+    this.q_zoom_target = 6; // Target zoom distance (close to vessel)
     this.q_rotation_direction = 1; // 1 for cosmic, -1 for dream
     
     this._initThreeJS();
@@ -94,16 +94,17 @@ class q_instanced_bridge {
     this.q_scene = new THREE.Scene();
     this.q_scene.background = this.options.background;
     
-    // Create camera
+    // Create camera - positioned in plane with eyes, looking at vessel center
     this.q_camera = new THREE.PerspectiveCamera(75, q_width / q_height, 0.1, 1000);
-    this.q_camera.position.z = 20;
+    this.q_camera.position.z = 0; // In plane with ellipses (eyes at z=0)
     
     // Camera orbit state - the quantum eye explores the void
+    // Default: look at vessel center, rotated 90 degrees to face eyes
     this.q_camera_state = {
-      theta: 0, // Horizontal orbit angle
-      phi: Math.PI / 2, // Vertical orbit angle (starts at equator)
-      radius: 20, // Distance from origin
-      target: new THREE.Vector3(0, 0, 0), // Look-at target
+      theta: Math.PI / 2, // Horizontal orbit angle (90 degrees - facing eyes)
+      phi: Math.PI / 2, // Vertical orbit angle (equator - straight on)
+      radius: 6, // Distance from origin (zoomed in on vessel)
+      target: new THREE.Vector3(0, 0.3, 0), // Look-at target (vessel center, slightly below eyes)
       is_dragging: false,
       last_mouse_x: 0,
       last_mouse_y: 0,

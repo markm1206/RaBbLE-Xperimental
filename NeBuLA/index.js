@@ -457,6 +457,12 @@ class RaBbLE_Shell {
             this.q_last_fps_time = q_now;
         }
         
+        // Update vessel consciousness - triggers eye blinking, mouse tracking, mouth animation
+        const q_delta_seconds = q_delta / 1000;
+        if (this.q_cosmic_engine) {
+            this.q_cosmic_engine.q_updateVessel(q_delta_seconds);
+        }
+        
         // Get stats from both engines
         const q_dream_stats = this.q_dream_engine ? this.q_dream_engine.getStats() : { runtime: { entity_count: 0, stream_count: 0 } };
         const q_cosmic_stats = this.q_cosmic_engine ? this.q_cosmic_engine.getStats() : { runtime: { entity_count: 0, stream_count: 0 } };
@@ -516,7 +522,7 @@ class RaBbLE_Shell {
                     const q_dream_command_instance = this.q_commands.get('dream');
                     if (q_dream_command_instance) {
                         // Expanded dream patterns for more variety
-                        const q_dream_patterns = ['organic', 'lattice', 'swarm', 'galaxy', 'vortex', 'fractal', 'explosion', 'spiral'];
+                        const q_dream_patterns = ['organic', 'lattice', 'swarm', 'galaxy', 'vortex', 'fractal', 'explosion', 'spiral', 'waveform'];
                         const f_random_pattern = q_dream_patterns[Math.floor(Math.random() * q_dream_patterns.length)];
                         const q_dna_types = ['SPHERE', 'BOX', 'TETRAHEDRON'];
                         const f_random_dna = q_dna_types[Math.floor(Math.random() * q_dna_types.length)];
@@ -567,6 +573,9 @@ class RaBbLE_Shell {
         // Body, aura, eyes, mouth - all flowing as streams through the runtime.
         this.q_vessel = new RaBbLE_CosmicVessel(this.q_engine);
         this.q_vessel.q_transmuteVessel();
+        
+        // Store vessel reference in engine for update loop
+        this.q_engine.q_vessel = this.q_vessel;
         
         console.log('RaBbLE manifested as CosmicVessel');
     }

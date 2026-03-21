@@ -170,32 +170,23 @@ class RaBbLE_CosmicVessel {
       // Random entropy for organic movement
       q_entity_instance.q_transmuteEntropySignature(0.3 + Math.random() * 0.4);
       
+      // Set render order for body particles (layer 5)
+      q_entity_instance.q_transmuteRenderOrder(5);
+      
       q_stream_instance.q_transmuteEntity(q_entity_instance);
     }
     
-    // Apply body-specific flux modifier - particles stay in place with subtle pulsing
+    // Apply body-specific flux modifier - particles stay in place with no jitter
     q_stream_instance.q_transmuteFluxModifier((f_entity, f_index) => {
-      const q_time = this.q_time;
-      
-      // Keep particles within bounds (no drift movement)
-      const q_max_radius = this.q_config.q_spatial.q_body_radius;
-      const q_current_radius = Math.sqrt(
-        f_entity.flux_matrix[12] ** 2 +
-        f_entity.flux_matrix[13] ** 2 +
-        f_entity.flux_matrix[14] ** 2
-      );
-      
-      if (q_current_radius > q_max_radius) {
-        const q_factor = q_max_radius / q_current_radius;
-        f_entity.flux_matrix[12] *= q_factor;
-        f_entity.flux_matrix[13] *= q_factor;
-        f_entity.flux_matrix[14] *= q_factor;
+      // Store original position if not already stored
+      if (!f_entity.q_original_position) {
+        f_entity.q_storeOriginalPosition();
       }
       
-      // Gentle entropy pulse only - no positional drift
-      const q_pulse = Math.sin(q_time + f_index * 0.1) * 0.1;
-      f_entity.q_transmuteEntropy(0.3 + q_pulse);
+      // Reset position to original (counteracts any drift)
+      f_entity.q_resetToOriginalPosition();
       
+      // No entropy pulse - particles remain perfectly still
       return f_entity;
     });
     
@@ -252,17 +243,23 @@ class RaBbLE_CosmicVessel {
       // Higher entropy for aura - more chaotic
       q_entity_instance.q_transmuteEntropySignature(0.5 + Math.random() * 0.3);
       
+      // Set render order for aura particles (layer 6)
+      q_entity_instance.q_transmuteRenderOrder(6);
+      
       q_stream_instance.q_transmuteEntity(q_entity_instance);
     }
     
-    // Apply aura-specific flux modifier - particles stay in place with pulsing
+    // Apply aura-specific flux modifier - particles stay in place with no jitter
     q_stream_instance.q_transmuteFluxModifier((f_entity, f_index) => {
-      const q_time = this.q_time;
+      // Store original position if not already stored
+      if (!f_entity.q_original_position) {
+        f_entity.q_storeOriginalPosition();
+      }
       
-      // Entropy pulse only - no orbital movement
-      const q_pulse = Math.sin(q_time * 2 + f_index * 0.05) * 0.15;
-      f_entity.q_transmuteEntropy(0.5 + q_pulse);
+      // Reset position to original (counteracts any drift)
+      f_entity.q_resetToOriginalPosition();
       
+      // No entropy pulse - particles remain perfectly still
       return f_entity;
     });
     
@@ -343,7 +340,7 @@ class RaBbLE_CosmicVessel {
     q_createEyeEntities('left');
     q_createEyeEntities('right');
     
-    // Apply eye-specific flux modifier - blinking and mouse tracking for lifelike feel
+    // Apply eye-specific flux modifier - synchronized blinking, darting, and mouse tracking
     q_stream_instance.q_transmuteFluxModifier((f_entity, f_index) => {
       const q_time = this.q_time;
       
@@ -358,36 +355,92 @@ class RaBbLE_CosmicVessel {
             z: 0
           };
           f_entity.q_current_position = { ...f_entity.q_original_position };
+          f_entity.q_original_shape = {
+            q_x_radius: q_eye_config.q_x_radius,
+            q_y_radius: q_eye_config.q_y_radius
+          };
         }
         
-        // Fast blinking: quick close/open every 2-3 seconds
-        const q_blink_cycle = 2.5 + Math.sin(f_index * 1.7) * 0.5; // 2-3 second cycle
-        const q_blink_phase = (q_time % q_blink_cycle) / q_blink_cycle;
+        // Synchronized blinking: both eyes blink at the same time
+        // Quick blink (0.25s) with varied time between blinks (3-5s)
+        if (!this.q_blink_initialized) {
+          this.q_blink_initialized = true;
+          this.q_last_blink_time = performance.now() / 1000;
+          this.q_next_blink_delay = 3.5 + Math.random() * 2;
+          this.q_is_blinking = false;
+          this.q_blink_start_time = 0;
+        }
         
-        // Fast blink curve: quick close (0.0-0.05), hold (0.05-0.1), quick open (0.1-0.15)
+        // Use real time for accurate timing
+        const q_current_time = performance.now() / 1000;
+        const q_time_since_last_blink = q_current_time - this.q_last_blink_time;
+        
         let q_blink_scale = 1.0;
-        if (q_blink_phase < 0.05) {
-          // Closing - very fast
-          q_blink_scale = 1.0 - (q_blink_phase / 0.05) * 0.9; // Scale to 0.1
-        } else if (q_blink_phase < 0.1) {
-          // Closed - minimal height
-          q_blink_scale = 0.1;
-        } else if (q_blink_phase < 0.15) {
-          // Opening - very fast
-          q_blink_scale = 0.1 + ((q_blink_phase - 0.1) / 0.05) * 0.9;
+        
+        if (!this.q_is_blinking && q_time_since_last_blink >= this.q_next_blink_delay) {
+          // Start a new blink
+          this.q_is_blinking = true;
+          this.q_blink_start_time = q_current_time;
+          this.q_next_blink_delay = 3.5 + Math.random() * 2;
+        }
+        
+        if (this.q_is_blinking) {
+          const q_blink_elapsed = q_current_time - this.q_blink_start_time;
+          const q_blink_duration = 0.25;
+          
+          if (q_blink_elapsed < q_blink_duration * 0.4) {
+            const q_progress = q_blink_elapsed / (q_blink_duration * 0.4);
+            q_blink_scale = 1.0 - q_progress * 0.9;
+          } else if (q_blink_elapsed < q_blink_duration * 0.6) {
+            q_blink_scale = 0.1;
+          } else if (q_blink_elapsed < q_blink_duration) {
+            const q_progress = (q_blink_elapsed - q_blink_duration * 0.6) / (q_blink_duration * 0.4);
+            q_blink_scale = 0.1 + q_progress * 0.9;
+          } else {
+            this.q_is_blinking = false;
+            this.q_last_blink_time = q_current_time;
+            q_blink_scale = 1.0;
+          }
+        }
+        
+        // Apply blink via shape_params - bridge reads this for ELLIPSE scale
+        f_entity.q_shape_params.q_y_radius = f_entity.q_original_shape.q_y_radius * q_blink_scale;
+        
+        // Dart animation: sudden eye movements every 3-4 seconds
+        const q_dart_cycle = 3.5 + Math.sin(f_index * 2.3) * 0.5;
+        const q_dart_phase = (q_time % q_dart_cycle) / q_dart_cycle;
+        
+        // Dart happens quickly (0.0-0.1), then settles (0.1-0.2)
+        let q_dart_offset_x = 0;
+        let q_dart_offset_y = 0;
+        
+        if (q_dart_phase < 0.1) {
+          // Quick dart to random position
+          const q_dart_seed = Math.floor(q_time / q_dart_cycle);
+          const q_dart_angle = (Math.sin(q_dart_seed * 7.3) + 1) * Math.PI;
+          const q_dart_distance = 0.08 + Math.sin(q_dart_seed * 3.1) * 0.04;
+          q_dart_offset_x = Math.cos(q_dart_angle) * q_dart_distance;
+          q_dart_offset_y = Math.sin(q_dart_angle) * q_dart_distance;
+        } else if (q_dart_phase < 0.2) {
+          // Settle back smoothly
+          const q_settle_progress = (q_dart_phase - 0.1) / 0.1;
+          const q_dart_seed = Math.floor(q_time / q_dart_cycle);
+          const q_dart_angle = (Math.sin(q_dart_seed * 7.3) + 1) * Math.PI;
+          const q_dart_distance = (0.08 + Math.sin(q_dart_seed * 3.1) * 0.04) * (1 - q_settle_progress);
+          q_dart_offset_x = Math.cos(q_dart_angle) * q_dart_distance;
+          q_dart_offset_y = Math.sin(q_dart_angle) * q_dart_distance;
         }
         
         // Mouse tracking: eyes follow the cursor
-        // Smooth interpolation toward target position
         const q_lerp_speed = 0.08;
         this.q_current_pupil_x += (this.q_mouse_x - this.q_current_pupil_x) * q_lerp_speed;
         this.q_current_pupil_y += (this.q_mouse_y - this.q_current_pupil_y) * q_lerp_speed;
         
-        // Calculate eye offset based on mouse position
-        const q_eye_offset_x = this.q_current_pupil_x * 0.15; // Max 0.15 units horizontal
-        const q_eye_offset_y = this.q_current_pupil_y * 0.1;  // Max 0.1 units vertical
+        // Calculate eye offset based on mouse position + dart
+        const q_eye_offset_x = this.q_current_pupil_x * 0.15 + q_dart_offset_x;
+        const q_eye_offset_y = this.q_current_pupil_y * 0.1 + q_dart_offset_y;
         
-        // Calculate target position with mouse offset
+        // Calculate target position with mouse offset + dart
         const q_target_x = f_entity.q_original_position.x + q_eye_offset_x;
         const q_target_y = f_entity.q_original_position.y + q_eye_offset_y;
         
@@ -398,21 +451,6 @@ class RaBbLE_CosmicVessel {
         // Apply position to flux_matrix
         f_entity.flux_matrix[12] = f_entity.q_current_position.x;
         f_entity.flux_matrix[13] = f_entity.q_current_position.y;
-        
-        // Apply blink using flux_matrix scale (Y-axis squish)
-        // Store original scale if not stored
-        if (!f_entity.q_original_scale) {
-          f_entity.q_original_scale = {
-            x: q_eye_config.q_x_radius,
-            y: q_eye_config.q_y_radius
-          };
-        }
-        
-        // Apply blink scale to Y-axis using flux_matrix
-        // Scale components are at indices 0 (X), 5 (Y), 10 (Z) on diagonal
-        f_entity.flux_matrix[0] = f_entity.q_original_scale.x; // Keep X scale
-        f_entity.flux_matrix[5] = f_entity.q_original_scale.y * q_blink_scale; // Squish Y
-        f_entity.flux_matrix[10] = 1.0; // Keep Z scale
       }
       
       return f_entity;
@@ -463,27 +501,25 @@ class RaBbLE_CosmicVessel {
         q_mouth_entity.flux_matrix[13] = q_base_y;
         q_mouth_entity.flux_matrix[14] = q_mouth_config.q_position.z + q_z_offset;
         
-        // Set line length and orientation
+        // Set line length and orientation (increased for visibility)
         q_mouth_entity.q_transmuteShapeParams({
-          q_length: 0.08 + Math.random() * 0.04 // Line segment length
+          q_length: 0.12 + Math.random() * 0.04 // Line segment length (increased)
         });
         
-        // Color with variation
-        const q_color_variation = Math.random();
-        let q_color;
-        if (q_color_variation < 0.3) {
-          q_color = this.q_config.q_colors.mouth.q_primary;
-        } else if (q_color_variation < 0.6) {
-          q_color = this.q_config.q_colors.mouth.q_emissive;
-        } else {
-          q_color = 0x00ffff; // Cyan highlight
-        }
+        // Color palette: purple, pink, blue, cyan
+        const q_mouth_colors = [
+          0x8B5CF6, // Purple
+          0xEC4899, // Pink
+          0x3B82F6, // Blue
+          0x06B6D4  // Cyan
+        ];
+        const q_color = q_mouth_colors[Math.floor(Math.random() * q_mouth_colors.length)];
         
         q_mouth_entity.q_transmuteRenderColor(q_color);
         q_mouth_entity.q_render_size = 1.0;
-        q_mouth_entity.q_render_emissive = 0.7 + Math.random() * 0.3;
+        q_mouth_entity.q_render_emissive = 1.0; // Maximum emissive for visibility
         q_mouth_entity.q_transmuteEntropySignature(0.3 + Math.random() * 0.2);
-        q_mouth_entity.q_transmuteRenderOrder(10);
+        q_mouth_entity.q_transmuteRenderOrder(20); // Render on top of everything
         
         q_stream_instance.q_transmuteEntity(q_mouth_entity);
       }
@@ -492,6 +528,20 @@ class RaBbLE_CosmicVessel {
     // Apply mouth flux modifier - waveform animation with entropy-driven pulses
     q_stream_instance.q_transmuteFluxModifier((f_entity, f_index) => {
       const q_time = this.q_time;
+      
+      // Store original position if not already stored (prevents drift from Runtime jitter)
+      if (!f_entity.q_original_position) {
+        f_entity.q_original_position = {
+          x: f_entity.flux_matrix[12],
+          y: f_entity.flux_matrix[13],
+          z: f_entity.flux_matrix[14]
+        };
+      }
+      
+      // Reset position to original FIRST (counteracts Runtime jitter)
+      f_entity.flux_matrix[12] = f_entity.q_original_position.x;
+      f_entity.flux_matrix[13] = f_entity.q_original_position.y;
+      f_entity.flux_matrix[14] = f_entity.q_original_position.z;
       
       // Only animate LINE entities (mouth waveform)
       if (f_entity.dna_type === 'LINE' && f_entity.q_wave_t !== undefined) {
@@ -521,9 +571,9 @@ class RaBbLE_CosmicVessel {
         const q_z_pulse = Math.sin(q_time * 2 + f_entity.q_wave_line * 0.5) * 0.02;
         f_entity.flux_matrix[14] += q_z_pulse;
         
-        // Pulse emissive based on wave intensity
+        // Pulse emissive based on wave intensity (keep high for visibility)
         const q_wave_intensity = Math.abs(q_combined_wave);
-        f_entity.q_render_emissive = 0.5 + q_wave_intensity * 0.5;
+        f_entity.q_render_emissive = 0.8 + q_wave_intensity * 0.2; // Keep bright (0.8-1.0 range)
         
         // Update entropy signature
         f_entity.q_transmuteEntropy(0.3 + q_wave_intensity * 0.4);

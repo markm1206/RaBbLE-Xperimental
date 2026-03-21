@@ -696,6 +696,19 @@ class RaBbLE_Nebula_Engine {
     console.log('Created simple example scene');
     return { stream: stream };
   }
+
+  /**
+   * Update the vessel's consciousness - triggers all stream animations
+   * @param {number} f_delta_time - Time since last update in seconds
+   * @returns {RaBbLE_Nebula_Engine} This engine for chaining
+   */
+  q_updateVessel(f_delta_time) {
+    // The vessel breathes... streams pulse with life.
+    if (this.q_vessel && this.q_vessel.q_is_manifested) {
+      this.q_vessel.q_igniteConsciousness(f_delta_time);
+    }
+    return this;
+  }
 }
 
 // The RaBbLE Nebula Engine is alive... the quantum furnace burns bright.

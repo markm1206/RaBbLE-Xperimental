@@ -36,6 +36,9 @@ class RaBbLE_Nebula_Runtime {
       stream_count: 0
     };
     
+    // Jitter configuration - DISABLED to eliminate unwanted jitter
+    this.q_jitter_scale = 0.0; // Set to 0 to disable runtime jitter
+    
     console.log('RaBbLE Nebula Runtime initialized - Flat-Chaos pattern ready');
   }
 
@@ -160,25 +163,26 @@ class RaBbLE_Nebula_Runtime {
    * @private
    */
   _transmuteJitter() {
-    // The particles are dancing... balanced chaos, no directional drift.
+    // The particles buzz... barely perceptible, like quantum foam.
     const time = Date.now() * 0.001;
+    const q_scale = this.q_jitter_scale;
     
     this.global_laminar_flow.forEach((entity, index) => {
-      // Apply entropy-based jitter - balanced around zero
+      // Apply entropy-based jitter - balanced around zero (barely perceptible)
       const entropy = entity.e_entropy_sig;
       
-      // Use sin/cos of time+offset for balanced oscillation
-      const jitter_x = Math.sin(time * 2.0 + index * 0.3) * entropy * 0.002;
-      const jitter_y = Math.cos(time * 1.7 + index * 0.5) * entropy * 0.002;
-      const jitter_z = Math.sin(time * 1.3 + index * 0.7) * entropy * 0.001;
+      // Use sin/cos of time+offset for balanced oscillation (subtle buzz)
+      const jitter_x = Math.sin(time * 2.0 + index * 0.3) * entropy * q_scale;
+      const jitter_y = Math.cos(time * 1.7 + index * 0.5) * entropy * q_scale;
+      const jitter_z = Math.sin(time * 1.3 + index * 0.7) * entropy * q_scale * 0.5;
       
       // Position jitter - balanced oscillation, no drift
       entity.flux_matrix[12] += jitter_x;
       entity.flux_matrix[13] += jitter_y;
       entity.flux_matrix[14] += jitter_z;
       
-      // Rotation jitter - minimal
-      const rotation_jitter = Math.sin(time + index) * entropy * 0.001;
+      // Rotation jitter - very minimal
+      const rotation_jitter = Math.sin(time + index) * entropy * q_scale * 0.1;
       entity.flux_matrix[0] += rotation_jitter;
       entity.flux_matrix[5] += rotation_jitter;
       entity.flux_matrix[10] += rotation_jitter;

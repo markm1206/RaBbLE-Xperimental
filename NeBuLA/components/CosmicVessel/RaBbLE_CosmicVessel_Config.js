@@ -66,9 +66,9 @@ const COSMIC_VESSEL_CONFIG = {
 
     // The vessel's mouth parameters
     q_mouth: {
-        q_tube_radius: 0.06,       // Waveform tube thickness
+        q_tube_radius: 0.12,       // Waveform tube thickness (doubled for visibility)
         q_x_range: 1.5,            // Mouth width
-        q_position: { x: 0, y: -0.1, z: 0 },
+        q_position: { x: 0, y: -0.1, z: 0.15 },  // Within body, slightly forward for visibility
         q_scale: 1.2,
         q_segments: 200,           // Waveform smoothness
         q_ripple_count: 8          // Number of ripples in waveform

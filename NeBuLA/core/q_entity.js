@@ -234,6 +234,49 @@ class q_entity {
   }
 
   /**
+   * Store current position as original position
+   * Utility method to prevent position drift from jitter
+   * @returns {q_entity} This entity for chaining
+   */
+  q_storeOriginalPosition() {
+    this.q_original_position = {
+      x: this.flux_matrix[12],
+      y: this.flux_matrix[13],
+      z: this.flux_matrix[14]
+    };
+    return this;
+  }
+
+  /**
+   * Reset position to stored original position
+   * Utility method to counteract position drift
+   * @returns {q_entity} This entity for chaining
+   */
+  q_resetToOriginalPosition() {
+    if (this.q_original_position) {
+      this.flux_matrix[12] = this.q_original_position.x;
+      this.flux_matrix[13] = this.q_original_position.y;
+      this.flux_matrix[14] = this.q_original_position.z;
+    }
+    return this;
+  }
+
+  /**
+   * Apply gentle entropy pulse without position drift
+   * Utility method for organic movement without jitter
+   * @param {number} f_time - Current time
+   * @param {number} f_index - Entity index for phase variation
+   * @param {number} f_base_entropy - Base entropy value (0.0 to 1.0)
+   * @param {number} f_pulse_amplitude - Pulse amplitude (0.0 to 1.0)
+   * @returns {q_entity} This entity for chaining
+   */
+  q_applyEntropyPulse(f_time, f_index, f_base_entropy = 0.3, f_pulse_amplitude = 0.1) {
+    const pulse = Math.sin(f_time + f_index * 0.1) * f_pulse_amplitude;
+    this.q_transmuteEntropy(f_base_entropy + pulse);
+    return this;
+  }
+
+  /**
    * Serialize entity to JSON format
    * @returns {Object} Serialized entity data
    */
