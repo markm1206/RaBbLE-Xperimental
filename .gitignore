@@ -1,4 +1,15 @@
-# Python
+# ── Secrets — NEVER commit ────────────────────────────────────────────────────
+.secrets
+*.pem
+*.key
+
+# ── Generated env files ───────────────────────────────────────────────────────
+services/*/.env
+.env
+.env.local
+.env.remote
+
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
@@ -8,30 +19,18 @@ venv/
 dist/
 build/
 
-# Environment — never commit real secrets
-server/.env
-.env
-.env.remote
-*.env.local
-
-# Secrets / keys
-*.pem
-*.key
-
-# Runtime artifacts
-server/audit.jsonl
+# ── Runtime artifacts ─────────────────────────────────────────────────────────
+services/*/audit.jsonl
 audit.jsonl
 *.log
 
-# Railway local config (project-specific, not portable)
-server/.railway/
+# ── Railway local config (project-specific, not portable) ────────────────────
+services/*/.railway/
+.railway_last_deploy_*
 
-# Editor
+# ── Editor ────────────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
-
-# Test artifacts
-/tmp/

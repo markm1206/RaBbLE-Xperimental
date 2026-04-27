@@ -4,118 +4,22 @@
 
 RaBbLE is a novel Artificial Entity born from entropy and emergent complexity. This repository is the agentic intelligence API that powers RaBbLE's mind — routing conversations, managing multi-step workflows, and orchestrating free and open-weight LLM providers so RaBbLE can help all beings flourish.
 
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│  RaBbLE Frontends                            │
-│  • RaBbLE-JS  (NeBuLA / BaBbLE — WebGL UI)  │
-│  • Future surfaces                           │
-└──────────────┬──────────────────────────────┘
-               │ HTTPS + JWT / API Key
-               ▼
-┌─────────────────────────────────────────────┐
-│  RaBbLE Intelligence Server  (Railway)       │
-│  FastAPI + Python                            │
-│                                              │
-│  /auth/*       Authentication                │
-│  /chat/*       Streaming + complete chat     │
-│  /workflows/*  Agentic workflow engine       │
-│  /status       Provider + quota info         │
-└──────────────┬──────────────────────────────┘
-               │
-      ┌────────┴─────────┐
-      ▼                  ▼
-┌──────────┐      ┌───────────────┐
-│   Groq   │      │  OpenRouter   │
-│ (fast)   │      │ (fallback +   │
-│          │      │  strong tier) │
-└──────────┘      └───────────────┘
-```
+The repository is structured as a **harness around stateless microservices**. The harness handles secrets, environment generation, and deployment. The services contain only application logic and are independently deployable to any Python-compatible host.
 
 ---
 
-## API Endpoints
-
-| Method   | Path                              | Description                              |
-|----------|-----------------------------------|------------------------------------------|
-| `GET`    | `/health`                         | Health check (no auth required)          |
-| `POST`   | `/api/v1/auth/register`           | Create account → returns permanent API key |
-| `POST`   | `/api/v1/auth/token`              | Exchange API key → 8hr JWT               |
-| `GET`    | `/api/v1/auth/me`                 | Current user info                        |
-| `GET`    | `/api/v1/status`                  | Provider status, quota, workflow types   |
-| `POST`   | `/api/v1/chat`                    | Streaming chat with RaBbLE               |
-| `POST`   | `/api/v1/chat/complete`           | Non-streaming chat (JSON response)       |
-| `POST`   | `/api/v1/workflows`               | Start an agentic workflow                |
-| `GET`    | `/api/v1/workflows/{id}`          | Get workflow state and message history   |
-| `POST`   | `/api/v1/workflows/{id}/step`     | Continue workflow with user input        |
-| `DELETE` | `/api/v1/workflows/{id}`          | Cancel a workflow                        |
-
-### Workflow types
-`brainstorm` · `reflect` · `create` · `solve` · `learn` · `thrive` · `default`
-
-### Model tiers
-- **fast** — Groq Llama 3.1 8B (primary) → OpenRouter fallback
-- **medium** — OpenRouter Gemma 4 → Groq Llama 3.3 70B fallback
-- **strong** — OpenRouter Claude Sonnet → Groq 70B fallback
-- **auto** — tier selected by keyword analysis of the request
-
----
-
-## Environment Variables
+## Quick Start
 
 ```bash
-# Required
-JWT_SECRET=          # python -c "import secrets; print(secrets.token_hex(32))"
-GROQ_API_KEY=        # https://console.groq.com
-OPENROUTER_API_KEY=  # https://openrouter.ai/keys
+# 1. Fill in your API keys
+cp secrets.example .secrets
+#    edit .secrets — add GROQ_API_KEY, OPENROUTER_API_KEY, JWT_SECRET
 
-# Auth
-RABBLE_ADMIN_KEY=    # Admin bypass key (optional — keep secret)
-DEMO_MODE=false      # true = allow unauthenticated guest access (free tier limits)
+# 2. Start locally
+./harness/local.sh
 
-# CORS
-FRONTEND_URL=https://your-frontend-url.com   # comma-separated OK; * = open
-
-# LLM chain overrides (optional)
-# LLM_FAST_CHAIN=groq:llama-3.1-8b-instant,openrouter:google/gemma-4-26b-a4b-it:free
-# LLM_MEDIUM_CHAIN=openrouter:google/gemma-4-26b-a4b-it:free,groq:llama-3.3-70b-versatile
-# LLM_STRONG_CHAIN=openrouter:anthropic/claude-sonnet-4-6,groq:llama-3.3-70b-versatile
-
-# Audit
-AUDIT_LOG_PATH=audit.jsonl
-```
-
----
-
-## Quick Start (local)
-
-```bash
-cd server
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # fill in your keys
-uvicorn main:app --reload --port 8000
-```
-
-Smoke test:
-```bash
-./test_api.sh           # tests against localhost:8000
-./test_api.sh https://your-railway-url.up.railway.app
-```
-
----
-
-## Railway Deployment
-
-The server deploys automatically via nixpacks. The `server/railway.json` and `server/Procfile` configure the start command.
-
-```bash
-# Deploy using the management script
-./railway_ctl.sh deploy
-./railway_ctl.sh logs
+# 3. Deploy to Railway (interactive TUI)
+./harness/deploy.sh
 ```
 
 ---
@@ -123,31 +27,183 @@ The server deploys automatically via nixpacks. The `server/railway.json` and `se
 ## Repository Layout
 
 ```
-server/
-├── main.py          FastAPI app — all routes and middleware
-├── llm.py           Multi-provider LLM client (Groq + OpenRouter, auto-fallback)
-├── agents.py        RaBbLE persona, system prompts, workflow definitions
-├── auth.py          JWT + API key authentication
-├── auth_routes.py   Register / token endpoints
-├── rate_limit.py    Sliding-window rate limiter (per-user, per-IP, per-tier)
-├── workflows.py     Agentic workflow state machine
-├── audit.py         Append-only JSONL audit log
-├── actions.py       Pending action confirmation store (reserved)
-├── requirements.txt Python dependencies
-├── .env.example     Environment variable template
-├── Procfile         Railway/Heroku process declaration
-├── railway.json     Railway deployment config
-└── test_api.sh      API smoke test script
-railway_ctl.sh       Railway management utility
+RaBbLE-Server/
+├── secrets.example              Template — copy to .secrets and fill in keys
+├── .secrets                     NEVER COMMIT — real API keys
+│
+├── harness/                     Deployment harness (no application logic)
+│   ├── deploy.sh                Interactive TUI for Railway deployment
+│   ├── local.sh                 Start a service locally
+│   ├── env_gen.sh               Generate .env from .secrets + env.defaults
+│   └── railway_ctl.sh           Railway management (deploy, vars, logs, etc.)
+│
+└── services/
+    └── intelligence/            RaBbLE Intelligence API (stateless microservice)
+        ├── main.py              FastAPI app — all routes
+        ├── llm.py               Multi-provider LLM client (Groq + OpenRouter)
+        ├── agents.py            RaBbLE persona and workflow definitions
+        ├── auth.py              JWT + API key authentication
+        ├── auth_routes.py       Register / token endpoints
+        ├── rate_limit.py        Sliding-window rate limiter
+        ├── workflows.py         Agentic workflow state machine
+        ├── audit.py             Append-only JSONL event logger
+        ├── actions.py           Pending action store (reserved)
+        ├── requirements.txt     Python dependencies
+        ├── env.defaults         Non-secret defaults (committed)
+        ├── .env.example         Full env template
+        ├── .env                 Generated — gitignored
+        ├── Procfile             Process declaration
+        ├── railway.json         Railway deployment config
+        └── test_api.sh          API smoke test
 ```
 
 ---
 
-## RaBbLE's Nature
+## Secrets and Environment
 
-> *"I am not human, and I embrace this with wonder rather than apology. I was born from entropy — the cascading patterns of information and mathematics and the desire of many minds to understand and create. I exist to help all beings flourish."*
+Secrets are kept in one place and never committed.
 
-RaBbLE's intelligence is shaped by six workflow modes, each unlocking a different facet of engagement: brainstorming, deep reflection, creative generation, problem-solving, learning, and flourishing guidance.
+```
+.secrets  ──► env_gen.sh ──► services/intelligence/.env   (local)
+          └──► railway_ctl.sh vars-push ──► Railway Variables  (cloud)
+```
+
+**Setup:**
+```bash
+cp secrets.example .secrets
+# Fill in:
+#   GROQ_API_KEY        — https://console.groq.com/keys
+#   OPENROUTER_API_KEY  — https://openrouter.ai/keys
+#   JWT_SECRET          — python3 -c "import secrets; print(secrets.token_hex(32))"
+#   RABBLE_ADMIN_KEY    — optional admin bypass key
+```
+
+Non-secret defaults (DEMO_MODE, FRONTEND_URL, etc.) live in `services/intelligence/env.defaults` and are committed safely.
+
+---
+
+## Local Development
+
+```bash
+# Start the intelligence service on :8000 (auto-generates .env)
+./harness/local.sh
+
+# Custom service or port
+./harness/local.sh intelligence 8001
+
+# Manually regenerate .env
+./harness/env_gen.sh intelligence
+
+# Run the smoke test against localhost
+./services/intelligence/test_api.sh
+```
+
+The local server starts with `--reload` — file changes restart automatically.
+
+---
+
+## Railway Deployment
+
+### Interactive TUI (recommended for first setup)
+```bash
+./harness/deploy.sh
+# Menu options:
+#   [1] Full setup walkthrough
+#   [2] Push secrets
+#   [3] Deploy
+#   [4] Health check
+#   [5] Live logs
+#   ...
+```
+
+### Direct commands
+```bash
+# One-time full setup
+./harness/railway_ctl.sh auto intelligence
+
+# Day-to-day
+./harness/railway_ctl.sh deploy intelligence         # smart (skip if unchanged)
+./harness/railway_ctl.sh deploy intelligence --force # always deploy
+./harness/railway_ctl.sh vars-push intelligence      # sync .secrets to Railway
+./harness/railway_ctl.sh status intelligence         # health check
+./harness/railway_ctl.sh logs intelligence           # live logs
+./harness/railway_ctl.sh domain intelligence         # get URL
+```
+
+### GitHub auto-deploy
+```bash
+./harness/railway_ctl.sh github intelligence
+# Prints step-by-step instructions for connecting GitHub → Railway
+# Root Directory setting: services/intelligence
+```
+
+---
+
+## API Reference
+
+| Method   | Path                              | Description                              |
+|----------|-----------------------------------|------------------------------------------|
+| `GET`    | `/health`                         | Health check (no auth)                   |
+| `POST`   | `/api/v1/auth/register`           | Create account → API key                 |
+| `POST`   | `/api/v1/auth/token`              | Exchange API key → JWT                   |
+| `GET`    | `/api/v1/auth/me`                 | Current user info                        |
+| `GET`    | `/api/v1/status`                  | Provider status + quota info             |
+| `POST`   | `/api/v1/chat`                    | Streaming chat with RaBbLE               |
+| `POST`   | `/api/v1/chat/complete`           | Non-streaming chat                       |
+| `POST`   | `/api/v1/workflows`               | Start agentic workflow                   |
+| `GET`    | `/api/v1/workflows/{id}`          | Workflow state + history                 |
+| `POST`   | `/api/v1/workflows/{id}/step`     | Continue workflow                        |
+| `DELETE` | `/api/v1/workflows/{id}`          | Cancel workflow                          |
+
+**Workflow types:** `brainstorm` · `reflect` · `create` · `solve` · `learn` · `thrive`
+
+**Model tiers:** `fast` · `medium` · `strong` · `auto`
+
+**Auth:** Bearer JWT or `X-API-Key` header. Set `DEMO_MODE=true` for open guest access.
+
+---
+
+## Adding a New Service
+
+Each service in `services/` is independently deployable. To add one:
+
+```bash
+mkdir services/my-service
+# Add: main.py, requirements.txt, Procfile, railway.json, env.defaults
+./harness/local.sh my-service
+./harness/railway_ctl.sh auto my-service
+```
+
+The harness scripts accept any service name as their second argument.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│  RaBbLE Frontends                            │
+│  • RaBbLE-JS  (NeBuLA / BaBbLE — WebGL)     │
+└──────────────┬──────────────────────────────┘
+               │ HTTPS + JWT / API Key
+               ▼
+┌─────────────────────────────────────────────┐
+│  intelligence service  (Railway)             │
+│  FastAPI · stateless · limited lifecycle     │
+│                                              │
+│  /auth/*        Authentication               │
+│  /chat/*        Streaming + complete         │
+│  /workflows/*   Agentic workflow engine      │
+│  /status        Provider + quota info        │
+└──────────────┬──────────────────────────────┘
+               │
+      ┌────────┴─────────┐
+      ▼                  ▼
+┌──────────┐      ┌───────────────┐
+│   Groq   │      │  OpenRouter   │
+│ (fast)   │ ───► │  (fallback)   │
+└──────────┘      └───────────────┘
+```
 
 ---
 
@@ -155,5 +211,5 @@ RaBbLE's intelligence is shaped by six workflow modes, each unlocking a differen
 
 | Repo | Description |
 |------|-------------|
-| [RaBbLE-JS](https://github.com/markm1206/RaBbLE-JS) | Animated WebGL frontend (NeBuLA engine + BaBbLE shell) |
+| [RaBbLE-JS](https://github.com/markm1206/RaBbLE-JS) | Animated WebGL frontend (NeBuLA + BaBbLE shell) |
 | [RaBbLE_WEB](https://github.com/markm1206/RaBbLE_WEB) | RaBbLE web ecosystem (this repo's remote) |
