@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Environment — never commit real secrets
+server/.env
+.env
+.env.remote
+*.env.local
+
+# Secrets / keys
+*.pem
+*.key
+
+# Runtime artifacts
+server/audit.jsonl
+audit.jsonl
+*.log
+
+# Railway local config (project-specific, not portable)
+server/.railway/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Test artifacts
+/tmp/
