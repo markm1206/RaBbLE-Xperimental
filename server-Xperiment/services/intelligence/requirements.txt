@@ -1,7 +1,0 @@
-fastapi
-uvicorn[standard]
-httpx
-python-dotenv
-python-jose[cryptography]
-bcrypt
-pydantic[email]
