@@ -1,0 +1,112 @@
+# BaBbLE - The Babbling Shell
+
+## Overview
+
+BaBbLE (Babbling Behavioral Learning Engine) is the command-line interface and shell system for RaBbLE. It provides an interactive terminal environment where users can communicate with the quantum nebula system through typed commands.
+
+## Architecture
+
+BaBbLE follows the **BaBbLE Pipeline** pattern - a transformative approach that processes commands through four distinct stages:
+
+```
+Source → Filter → Transmute → Sink
+  ↓        ↓         ↓         ↓
+ Input   Validate  Process   Output
+```
+
+### Core Components
+
+#### Command Pipeline (`RaBbLE_BaBbLE_Pipeline.js`)
+The base class for all shell commands, implementing the four-stage pipeline:
+
+- **Source**: Generate input data from user arguments
+- **Filter**: Validate and transform input
+- **Transmute**: Apply core logic and transformations
+- **Sink**: Format and display output
+
+#### Command Types
+- `q_dream_command` - Create quantum streams with Dreamer patterns
+- `q_status_command` - Display system status and metrics
+- `q_help_command` - Show available commands
+- `q_chaos_command` - Expand entropy bounds for dynamic visuals
+- `q_collapse_command` - Stabilize the system with lower entropy
+- `q_patterns_command` - List available dream patterns
+
+## Usage
+
+### Starting the Shell
+The shell is automatically initialized when loading the RaBbLE system. The terminal interface appears after the boot sequence completes.
+
+### Available Commands
+
+#### `dream [pattern] [count] [type]`
+Create quantum streams with specified parameters.
+
+**Patterns:**
+- `organic` - Golden angle growth pattern (entropy: 0.2-0.8)
+- `lattice` - Geometric grid structure (entropy: 0.1-0.4)
+- `swarm` - Chaotic particle cloud (entropy: 0.3-0.9)
+- `galaxy` - Spiral arm formation (entropy: 0.2-0.7)
+
+**Types:**
+- `SPHERE` - Spherical geometry
+- `BOX` - Cubic geometry
+- `TETRAHEDRON` - Tetrahedral geometry
+
+**Example:**
+```
+> dream organic 50 SPHERE
+[DREAM] Dreaming 50 SPHERE entities with organic pattern...
+  Pattern: organic
+  Count: 50
+  Type: SPHERE
+```
+
+#### `status`
+Display current system metrics including FPS, entity count, stream count, and average entropy.
+
+#### `chaos [intensity]`
+Expand entropy bounds for more dynamic visual effects. Intensity ranges from 0.0 to 1.0.
+
+#### `collapse [intensity]`
+Stabilize the system with lower entropy for calmer visuals.
+
+#### `patterns`
+List all available dream patterns with their entropy ranges.
+
+#### `help`
+Show all available commands.
+
+## CSS Styling
+
+The shell uses CSS variables for theming:
+
+```css
+:root {
+  --q-cyan: #00ffff;
+  --q-magenta: #ff00ff;
+  --q-purple: #8a2be2;
+  --q-glass: rgba(0, 0, 0, 0.7);
+  --q-glass-border: rgba(0, 255, 255, 0.3);
+}
+```
+
+## Integration with NeBuLA
+
+BaBbLE communicates with the NeBuLA rendering engine through the `RaBbLE_Nebula_Engine` class. Commands that affect visuals (like `dream`, `chaos`, `collapse`) directly modify the rendering parameters.
+
+## RBCNS Compliance
+
+All BaBbLE code follows the RaBbLE Behavioral Coding & Naming Specification:
+
+- Variables prefixed with `q_` (quantum) or `e_` (entropy)
+- Functions use active verbs (transmute, ignite, dissolve)
+- Comments follow "stream-of-consciousness" style
+- Flat-Chaos patterns with shallow nesting
+
+## Future Enhancements
+
+- Command history and autocomplete
+- Scripting support for complex operations
+- Plugin system for custom commands
+- Integration with Ai/ subsystem for intelligent assistance

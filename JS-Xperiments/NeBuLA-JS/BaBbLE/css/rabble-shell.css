@@ -1,0 +1,609 @@
+/**
+ * RaBbLE Shell CSS - Unified Quantum Theme
+ * All shell styles in one place, extracted from HTML
+ */
+
+:root {
+  /* Quantum Color Palette */
+  --q-cyan: #00ffff;
+  --q-magenta: #ff00ff;
+  --q-purple: #8a2be2;
+  --q-black: #000000;
+  --q-white: #ffffff;
+  
+  /* Glass Effect */
+  --q-glass: rgba(0, 0, 0, 0.7);
+  --q-glass-border: rgba(0, 255, 255, 0.3);
+  
+  /* Typography */
+  --q-font: 'Courier New', Courier, monospace;
+  --q-font-size: 12px;
+  --q-line-height: 1.4;
+  
+  /* Spacing */
+  --q-padding: 10px;
+  --q-margin: 5px;
+  --q-border-radius: 4px;
+  
+  /* Transitions */
+  --q-transition: 1s ease;
+}
+
+/* Base Styles */
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--q-black);
+  color: var(--q-cyan);
+  font-family: var(--q-font);
+}
+
+/* Boot Sequence */
+#boot-sequence {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background: var(--q-black);
+  transition: opacity var(--q-transition), visibility var(--q-transition);
+}
+
+.boot-line {
+  margin: var(--q-margin);
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px var(--q-cyan);
+}
+
+/* Manifestation Container */
+#rabble-manifestation {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Ignited State */
+.ignited #boot-sequence {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.ignited .rabble-window {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Terminal Output */
+#terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--q-padding);
+  font-size: var(--q-font-size);
+  line-height: var(--q-line-height);
+}
+
+/* Terminal Input */
+#terminal-input-line {
+  display: flex;
+  padding: var(--q-padding);
+  border-top: 1px solid var(--q-glass-border);
+}
+
+#terminal-input {
+  background: transparent;
+  border: none;
+  color: var(--q-cyan);
+  font-family: inherit;
+  font-size: var(--q-font-size);
+  flex: 1;
+  outline: none;
+}
+
+/* Terminal Lines */
+.terminal-line {
+  margin-bottom: var(--q-margin);
+}
+
+.user-cmd {
+  color: var(--q-magenta);
+}
+
+/* Scrollbar Styles */
+#terminal-output::-webkit-scrollbar {
+  width: 4px;
+}
+
+#terminal-output::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#terminal-output::-webkit-scrollbar-thumb {
+  background: var(--q-glass-border);
+}
+
+/* Window Menu Bar */
+#window-menu {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+  background: var(--q-glass);
+  border: 1px solid var(--q-glass-border);
+  border-radius: var(--q-border-radius);
+  padding: 6px 10px;
+  backdrop-filter: blur(5px);
+}
+
+#window-menu button {
+  background: transparent;
+  border: 1px solid var(--q-glass-border);
+  color: var(--q-cyan);
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--q-font);
+  font-size: 11px;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+#window-menu button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: var(--q-cyan);
+}
+
+#window-menu button.active {
+  background: rgba(0, 255, 255, 0.3);
+  border-color: var(--q-cyan);
+  text-shadow: 0 0 5px var(--q-cyan);
+}
+
+/* Performance Overlay */
+#performance-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--q-glass);
+  border: 1px solid var(--q-cyan);
+  border-radius: var(--q-border-radius);
+  padding: var(--q-padding);
+  font-size: 11px;
+  color: var(--q-cyan);
+  z-index: 100;
+  min-width: 120px;
+  backdrop-filter: blur(5px);
+}
+
+#performance-overlay div {
+  margin: 3px 0;
+}
+
+#performance-overlay span {
+  color: var(--q-magenta);
+  font-weight: bold;
+}
+
+/* ==========================================
+   QUANTUM WINDOW SYSTEM
+   Separate canvas windows for Dream and Cosmic
+   ========================================== */
+
+/* Window Container */
+.rabble-window {
+  position: absolute;
+  background: var(--q-glass);
+  border: 1px solid var(--q-glass-border);
+  border-radius: var(--q-border-radius);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: box-shadow 0.3s ease;
+}
+
+.rabble-window:focus-within {
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+/* Dream Window - Left Side */
+#dream-window {
+  left: 20px;
+  top: 60px;
+  width: 45%;
+  height: 60%;
+  z-index: 50;
+}
+
+/* Cosmic Window - Right Side */
+#cosmic-window {
+  right: 20px;
+  top: 60px;
+  width: 45%;
+  height: 60%;
+  z-index: 50;
+}
+
+/* Terminal Window - Full Width Bottom */
+#terminal-window {
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  height: 200px;
+  z-index: 50;
+}
+
+.terminal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-content #terminal-output {
+  flex: 1;
+}
+
+/* Window Header - Draggable */
+.window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, rgba(138, 43, 226, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%);
+  border-bottom: 1px solid var(--q-glass-border);
+  cursor: move;
+  user-select: none;
+}
+
+.window-title {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--q-cyan);
+  text-shadow: 0 0 5px var(--q-cyan);
+}
+
+/* Window Controls */
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.window-controls button {
+  background: transparent;
+  border: 1px solid var(--q-glass-border);
+  color: var(--q-cyan);
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.window-controls button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: var(--q-cyan);
+}
+
+.window-close:hover {
+  background: rgba(255, 0, 100, 0.3) !important;
+  border-color: #ff0064 !important;
+  color: #ff0064 !important;
+}
+
+/* Window Content - Canvas Container */
+.window-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.window-content canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Minimized State */
+.rabble-window.minimized {
+  height: auto !important;
+}
+
+.rabble-window.minimized .window-content {
+  display: none;
+}
+
+/* Window Focus States */
+.rabble-window.focused {
+  z-index: 100;
+  border-color: var(--q-cyan);
+}
+
+/* Window Hidden State */
+.rabble-window.hidden {
+  display: none;
+}
+
+/* Dragging State */
+.rabble-window.dragging {
+  opacity: 0.9;
+  cursor: grabbing;
+}
+
+/* Window Resize Handle */
+.rabble-window::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, var(--q-glass-border) 50%);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN - Mobile First
+   ========================================== */
+
+/* Tablet - 768px to 1024px */
+@media (max-width: 1024px) {
+  #dream-window,
+  #cosmic-window {
+    width: 47%;
+    height: 45%;
+  }
+  
+  #terminal-window {
+    height: 180px;
+  }
+  
+  #window-menu {
+    padding: 5px 8px;
+    gap: 5px;
+  }
+  
+  #window-menu button {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  
+  #performance-overlay {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: 100px;
+  }
+}
+
+/* Mobile Large - 480px to 768px */
+@media (max-width: 768px) {
+  /* Stack windows vertically */
+  #dream-window,
+  #cosmic-window {
+    width: calc(100% - 20px);
+    left: 10px;
+    right: 10px;
+    height: 35%;
+  }
+  
+  #dream-window {
+    top: 55px;
+  }
+  
+  #cosmic-window {
+    top: calc(35% + 65px);
+  }
+  
+  #terminal-window {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: calc(100% - 35% - 35% - 85px);
+    min-height: 120px;
+  }
+  
+  /* Window menu - horizontal scroll */
+  #window-menu {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    padding: 4px 6px;
+    gap: 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  
+  #window-menu button {
+    padding: 6px 10px;
+    font-size: 10px;
+    min-height: 32px;
+    flex-shrink: 0;
+  }
+  
+  /* Performance overlay - compact */
+  #performance-overlay {
+    top: 5px;
+    right: 5px;
+    padding: 4px 6px;
+    font-size: 9px;
+    min-width: 80px;
+  }
+  
+  #performance-overlay div {
+    margin: 1px 0;
+  }
+  
+  /* Window adjustments */
+  .window-header {
+    padding: 6px 10px;
+  }
+  
+  .window-title {
+    font-size: 11px;
+  }
+  
+  .window-controls button {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+  }
+  
+  /* Terminal sizing */
+  #terminal-output {
+    font-size: 11px;
+    padding: 8px;
+  }
+  
+  #terminal-input-line {
+    padding: 6px 8px;
+  }
+  
+  #terminal-input {
+    font-size: 11px;
+  }
+}
+
+/* Mobile Small - under 480px */
+@media (max-width: 480px) {
+  /* Full-width stacked layout */
+  #dream-window,
+  #cosmic-window {
+    width: calc(100% - 10px);
+    left: 5px;
+    right: 5px;
+    height: 30%;
+  }
+  
+  #dream-window {
+    top: 50px;
+  }
+  
+  #cosmic-window {
+    top: calc(30% + 60px);
+  }
+  
+  #terminal-window {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    height: calc(100% - 30% - 30% - 70px);
+    min-height: 100px;
+  }
+  
+  /* Menu - very compact */
+  #window-menu {
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    padding: 3px 4px;
+    gap: 3px;
+  }
+  
+  #window-menu button {
+    padding: 5px 8px;
+    font-size: 9px;
+    min-height: 28px;
+  }
+  
+  /* Performance - minimal */
+  #performance-overlay {
+    font-size: 8px;
+    padding: 3px 5px;
+    min-width: 60px;
+  }
+  
+  /* Touch-friendly window controls */
+  .window-controls button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+  
+  /* Smaller fonts */
+  .window-title {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  
+  #terminal-output {
+    font-size: 10px;
+    padding: 6px;
+  }
+  
+  #terminal-input {
+    font-size: 10px;
+  }
+  
+  .boot-line {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  #window-menu button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 12px;
+  }
+  
+  .window-controls button {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+  
+  #terminal-input {
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+  
+  /* Disable hover effects on touch devices */
+  #window-menu button:hover {
+    background: transparent;
+  }
+  
+  .window-controls button:hover {
+    background: transparent;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  #dream-window,
+  #cosmic-window {
+    width: 48%;
+    height: 60%;
+  }
+  
+  #dream-window {
+    left: 5px;
+    top: 45px;
+  }
+  
+  #cosmic-window {
+    right: 5px;
+    top: 45px;
+  }
+  
+  #terminal-window {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    height: calc(100% - 60% - 60px);
+    min-height: 80px;
+  }
+}

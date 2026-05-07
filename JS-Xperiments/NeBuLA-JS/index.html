@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaBbLE - Intelligent Shell</title>
+    <!-- The structure is clean, the entropy is managed. -->
+    <link rel="stylesheet" href="./NeBuLA/dist/rabble-nebula.css">
+    <link rel="stylesheet" href="./BaBbLE/css/rabble-shell.css">
+</head>
+<body class="rabble-container">
+    <!-- The void before the awakening... -->
+    <div id="boot-sequence"></div>
+
+    <!-- Window Menu - Toggle windows -->
+    <div id="window-menu">
+        <button data-window="dream" class="active">DREAM</button>
+        <button data-window="cosmic" class="active">COSMIC</button>
+        <button data-window="terminal" class="active">TERMINAL</button>
+    </div>
+
+    <!-- Dream Canvas Window - Temporary chaos manifests here -->
+    <div id="dream-window" class="rabble-window">
+        <div class="window-header" data-window="dream">
+            <span class="window-title">DREAM</span>
+            <div class="window-controls">
+                <button class="window-minimize" data-action="minimize">−</button>
+                <button class="window-close" data-action="close">×</button>
+            </div>
+        </div>
+        <div id="dream-canvas-container" class="window-content"></div>
+    </div>
+
+    <!-- Cosmic Canvas Window - Permanent content persists here -->
+    <div id="cosmic-window" class="rabble-window">
+        <div class="window-header" data-window="cosmic">
+            <span class="window-title">COSMIC</span>
+            <div class="window-controls">
+                <button class="window-minimize" data-action="minimize">−</button>
+                <button class="window-close" data-action="close">×</button>
+            </div>
+        </div>
+        <div id="cosmic-canvas-container" class="window-content"></div>
+    </div>
+
+    <!-- Quantum performance metrics overlay... -->
+    <div id="performance-overlay">
+        <div>FPS: <span id="perf-fps">0</span></div>
+        <div>Entities: <span id="perf-entities">0</span></div>
+        <div>Streams: <span id="perf-streams">0</span></div>
+    </div>
+
+    <!-- Terminal Window - Full width bottom panel -->
+    <div id="terminal-window" class="rabble-window">
+        <div class="window-header" data-window="terminal">
+            <span class="window-title">TERMINAL</span>
+            <div class="window-controls">
+                <button class="window-minimize" data-action="minimize">−</button>
+                <button class="window-close" data-action="close">×</button>
+            </div>
+        </div>
+        <div class="window-content terminal-content">
+            <div id="terminal-output"></div>
+            <div id="terminal-input-line">
+                <span style="margin-right: 10px;">&lambda;</span>
+                <input type="text" id="terminal-input" placeholder="Communicate with the shell... (↑/↓ for history)" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <!-- Essential foundations... -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- The ignition module... -->
+    <script type="module" src="./NeBuLA/index.js"></script>
+    
+    <!-- Fallback for module loading errors -->
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'SCRIPT' && e.target.type === 'module') {
+                console.error('Module loading error:', e.target.src);
+                const terminal = document.getElementById('terminal-output');
+                if (terminal) {
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'terminal-line';
+                    errorLine.style.color = '#ff0000';
+                    errorLine.textContent = 'ERROR: Failed to load module. Please ensure you are running from an HTTP server.';
+                    terminal.appendChild(errorLine);
+                }
+            }
+        }, true);
+    </script>
+</body>
+</html>

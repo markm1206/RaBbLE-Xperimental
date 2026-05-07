@@ -1,0 +1,370 @@
+/**
+ * RaBbLE Nebula Renderer - RBCNS Compliant CSS
+ * 
+ * Clean, minimal styling for RaBbLE Nebula Renderer components.
+ * All styles follow RBCNS naming conventions and structure.
+ * 
+ * @version 1.0.0
+ * @author RaBbLE Nebula Team
+ */
+
+/* RBCNS Compliant Base Styles */
+:root {
+    --rabble-primary: #00ffff;
+    --rabble-secondary: #ff00ff;
+    --rabble-accent: #00ffcc;
+    --rabble-background: #000000;
+    --rabble-surface: #1a1a1a;
+    --rabble-surface-dark: #0f0f0f;
+    --rabble-text: #ffffff;
+    --rabble-text-muted: #888888;
+    --rabble-border: #333333;
+    --rabble-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --rabble-font-mono: 'Courier New', Courier, monospace;
+}
+
+/* Container Styles */
+.rabble-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--rabble-background);
+}
+
+/* Control Group Styles */
+.rabble-control-group {
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--rabble-border);
+    padding-bottom: 10px;
+}
+
+.rabble-control-group:last-child {
+    border-bottom: none;
+}
+
+.rabble-stat-row {
+    font-size: 12px;
+    color: var(--rabble-text-muted);
+    margin: 4px 0;
+    font-family: var(--rabble-font-mono);
+}
+
+.rabble-stat-value {
+    color: var(--rabble-accent);
+    font-weight: bold;
+}
+
+/* UI Overlay Styles */
+.rabble-ui-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid var(--rabble-border);
+    border-radius: 8px;
+    color: var(--rabble-text);
+    font-family: var(--rabble-font-mono);
+    z-index: 100;
+    max-width: 350px;
+    backdrop-filter: blur(4px);
+}
+
+.rabble-ui-header {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: var(--rabble-primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--rabble-border);
+    padding-bottom: 10px;
+}
+
+.rabble-ui-section {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rabble-ui-subheader {
+    margin: 10px 0 8px 0;
+    font-size: 14px;
+    color: var(--rabble-secondary);
+}
+
+/* Button Styles */
+.rabble-button {
+    background: #333333;
+    color: var(--rabble-text);
+    border: 1px solid var(--rabble-border);
+    padding: 8px 12px;
+    margin: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: var(--rabble-font-mono);
+    font-size: 12px;
+    transition: all 0.2s ease;
+    text-align: center;
+    width: calc(50% - 8px);
+    display: inline-block;
+    vertical-align: top;
+}
+
+.rabble-button:hover {
+    background: #555555;
+    border-color: var(--rabble-accent);
+    color: var(--rabble-accent);
+    transform: translateY(-1px);
+}
+
+.rabble-button:active {
+    transform: translateY(0);
+}
+
+.rabble-button:disabled {
+    background: #222222;
+    color: #666666;
+    border-color: #444444;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.rabble-button-full {
+    width: 100%;
+    text-align: left;
+}
+
+/* Status and Metric Styles */
+.rabble-status {
+    font-size: 12px;
+    color: var(--rabble-text-muted);
+    margin: 5px 0;
+    font-family: var(--rabble-font-mono);
+}
+
+.rabble-metric {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin: 2px 0;
+}
+
+.rabble-metric-label {
+    color: var(--rabble-text-muted);
+}
+
+.rabble-metric-value {
+    color: var(--rabble-accent);
+    font-weight: bold;
+}
+
+.rabble-result {
+    font-size: 11px;
+    color: var(--rabble-accent);
+    margin: 5px 0;
+    font-weight: bold;
+    font-family: var(--rabble-font-mono);
+}
+
+/* Progress Bar Styles */
+.rabble-progress-container {
+    width: 100%;
+    height: 4px;
+    background: #333333;
+    margin: 5px 0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.rabble-progress-fill {
+    height: 100%;
+    background: var(--rabble-accent);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Performance Test Styles */
+.rabble-test-section {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rabble-recommendations {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    border-radius: 4px;
+}
+
+.rabble-recommendations h3 {
+    margin: 0 0 10px 0;
+    color: #ff0000;
+    font-size: 12px;
+    font-family: var(--rabble-font-mono);
+}
+
+.rabble-recommendation-item {
+    font-size: 11px;
+    color: #ffffff;
+    margin: 4px 0;
+    line-height: 1.4;
+    font-family: var(--rabble-font-mono);
+}
+
+/* Example Page Styles */
+.rabble-example-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: var(--rabble-background);
+}
+
+.rabble-example-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--rabble-border);
+    border-radius: 8px;
+    color: var(--rabble-text);
+    font-family: var(--rabble-font-mono);
+    z-index: 100;
+    max-width: 300px;
+}
+
+.rabble-pattern-info {
+    font-size: 11px;
+    color: #aaaaaa;
+    margin-top: 5px;
+    line-height: 1.4;
+    font-family: var(--rabble-font-mono);
+}
+
+/* Performance Page Styles */
+.rabble-performance-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--rabble-border);
+    border-radius: 8px;
+    color: var(--rabble-text);
+    font-family: var(--rabble-font-mono);
+    z-index: 100;
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .rabble-ui-overlay {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+    
+    .rabble-performance-overlay {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .rabble-button {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .rabble-ui-header {
+        font-size: 16px;
+    }
+    
+    .rabble-ui-subheader {
+        font-size: 12px;
+    }
+}
+
+/* Animation Classes */
+.rabble-fade-in {
+    animation: rabbleFadeIn 0.5s ease-out;
+}
+
+.rabble-slide-up {
+    animation: rabbleSlideUp 0.3s ease-out;
+}
+
+@keyframes rabbleFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes rabbleSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Accessibility Enhancements */
+.rabble-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .rabble-ui-overlay {
+        background: #000000;
+        border-color: #ffffff;
+        color: #ffffff;
+    }
+    
+    .rabble-button {
+        background: #ffffff;
+        color: #000000;
+        border-color: #000000;
+    }
+    
+    .rabble-button:hover {
+        background: #000000;
+        color: #ffffff;
+        border-color: #ffffff;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .rabble-ui-overlay,
+    .rabble-performance-overlay,
+    .rabble-button {
+        display: none !important;
+    }
+    
+    .rabble-container {
+        height: auto;
+        background: white;
+    }
+}

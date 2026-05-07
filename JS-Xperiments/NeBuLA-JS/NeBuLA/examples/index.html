@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaBbLE Nebula - Stream Engine</title>
+    <!-- The stylesheet holds the form... -->
+    <link rel="stylesheet" href="../dist/rabble-nebula.css">
+</head>
+<body class="rabble-container">
+    <div id="container"></div>
+    
+    <div id="ui-overlay" class="rabble-ui-overlay">
+        <h1 class="rabble-ui-header">RaBbLE Nebula Engine</h1>
+        
+        <div class="rabble-ui-section">
+            <div class="rabble-stat-row">Flux Status: <span id="status" class="rabble-stat-value">Awaiting Ignition...</span></div>
+            <div class="rabble-stat-row">Quantum Entities: <span id="entity-count" class="rabble-stat-value">0</span></div>
+            <div class="rabble-stat-row">Active Streams: <span id="stream-count" class="rabble-stat-value">0</span></div>
+            <div class="rabble-stat-row">Pulse Rate (FPS): <span id="fps-count" class="rabble-stat-value">0</span></div>
+        </div>
+        
+        <div class="rabble-control-group">
+            <h2 class="rabble-ui-subheader">Pattern Streams</h2>
+            <button id="btn-organic" class="rabble-button">Organic Flow</button>
+            <button id="btn-lattice" class="rabble-button">Lattice Grid</button>
+            <button id="btn-swarm" class="rabble-button">Swarm Intelligence</button>
+            <button id="btn-galaxy" class="rabble-button">Galaxy Spiral</button>
+        </div>
+        
+        <div class="rabble-control-group">
+            <h2 class="rabble-ui-subheader">Stream Management</h2>
+            <button id="btn-combine" class="rabble-button">Weave Streams</button>
+            <button id="btn-clear" class="rabble-button">Collapse All</button>
+            <button id="btn-chaos" class="rabble-button">Toggle Chaos</button>
+        </div>
+        
+        <div class="rabble-control-group">
+            <h2 class="rabble-ui-subheader">Performance</h2>
+            <button id="btn-add" class="rabble-button">Add Flux</button>
+            <button id="btn-remove" class="rabble-button">Remove Flux</button>
+            <button id="btn-stats" class="rabble-button">Toggle UI</button>
+        </div>
+        
+        <div class="rabble-pattern-info">
+            <strong>RBCNS Compliant</strong> • <strong>Flat-Chaos Enforced</strong><br>
+            The chaos is organized. The entropy is harnessed.
+        </div>
+    </div>
+
+    <!-- The logic is elsewhere... in the stream of modules. -->
+    <script type="module" src="./example.js"></script>
+</body>
+</html>
