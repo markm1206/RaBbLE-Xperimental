@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rabble - AI Agent Interface</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #rabble-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        rabble-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="rabble-container">
+        <rabble-canvas></rabble-canvas>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Project Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/RabbleRenderer.js"></script>
+    <script src="js/AnimationController.js"></script>
+    <script src="js/CombinedAnimationController.js"></script>
+    <script src="js/RabbleBody.js"></script>
+    <script src="js/RabbleParticles.js"></script>
+    <script src="js/Waveform.js"></script>
+    <script src="js/RabbleMouth.js"></script>
+    <script src="js/RabbleEyes.js"></script>
+    <script src="js/Rabble.js"></script>
+    <script src="js/RabbleCanvas.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>
