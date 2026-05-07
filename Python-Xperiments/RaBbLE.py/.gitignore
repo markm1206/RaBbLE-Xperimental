@@ -1,0 +1,8 @@
+# Python cache files
+__pycache__/
+
+# Lock files
+*.lock
+uv.lock
+logs/*
+# Other files to ignore
